@@ -22,6 +22,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
+import tawevents.dto.EstudioDTO;
 
 /**
  *
@@ -126,5 +127,14 @@ public class Estudio implements Serializable {
     public String toString() {
         return "tawevents.entity.Estudio[ id=" + id + " ]";
     }
-    
+
+    public EstudioDTO getDTO() {
+        EstudioDTO dto = new EstudioDTO();
+        dto.setId(id);
+        dto.setAnalista(analista.getId());
+        dto.setDescripcion(descripcion);
+        dto.setFecha(fecha);
+        dto.setBusqueda(busqueda);
+        return dto;
+    }
 }

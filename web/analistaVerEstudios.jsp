@@ -4,6 +4,7 @@
     Author     : daniel
 --%>
 
+<%@page import="tawevents.dto.EstudioDTO"%>
 <%@page import="tawevents.entity.Usuario"%>
 <%@page import="java.util.Date"%>
 <%@page import="java.text.SimpleDateFormat"%>
@@ -28,13 +29,13 @@
     <%
         }
         String confirmacion = request.getParameter("confirmacion");
-        String strID = request.getParameter("id");
+        String strID = request.getParameter("id"); // id del estudio seleccionado para eliminarse
 
         String desdeFecha = request.getParameter("desdeFecha");
         desdeFecha = (desdeFecha == null) ? "2021-01-01" : desdeFecha;
         String hastaFecha = request.getParameter("hastaFecha");
         hastaFecha = (hastaFecha == null) ? (new SimpleDateFormat("yyyy-MM-dd")).format(new Date()) : hastaFecha;
-        List<Estudio> lista = (List) request.getAttribute("lista");
+        List<EstudioDTO> lista = (List<EstudioDTO>) request.getAttribute("lista");
     %>
     <body>
         <div class="head">
@@ -97,7 +98,7 @@
                         <%
                             if (lista != null) {
                                 SimpleDateFormat formatoFecha = new SimpleDateFormat("dd-MM-yyyy");
-                                for (Estudio estudio : lista) {
+                                for (EstudioDTO estudio : lista) {
                         %>   
                         <tr>
                             <td class="text-nowrap"> <%= estudio.getId()%> </td>

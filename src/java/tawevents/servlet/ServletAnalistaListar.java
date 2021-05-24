@@ -21,8 +21,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import tawevents.dao.EstudioFacade;
+import tawevents.dto.EstudioDTO;
 import tawevents.entity.Estudio;
 import tawevents.entity.Usuario;
+import tawevents.service.EstudioService;
 
 /**
  *
@@ -30,10 +32,10 @@ import tawevents.entity.Usuario;
  */
 @WebServlet(name = "ServletAnalistaListar", urlPatterns = {"/ServletAnalistaListar"})
 public class ServletAnalistaListar extends HttpServlet {
-
+        
     @EJB
-    private EstudioFacade estudioFacade;
-
+    private EstudioService estudioService;
+    
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -47,34 +49,23 @@ public class ServletAnalistaListar extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
 
-        HttpSession session = request.getSession();
-        List<Estudio> lista = null;
+        // Comprobar que el usuario está conectado y es analita de eventos
+        HttpSession session = request.getSession(); 
+        
+        List<EstudioDTO> lista;
         Usuario usuario = (Usuario) session.getAttribute("usuario");
-        SimpleDateFormat formatoFecha = new SimpleDateFormat("yyyy-MM-dd");
         String strDesdeFecha = request.getParameter("desdeFecha");
         String strHastaFecha = request.getParameter("hastaFecha");
-        Date desdeFecha = null;
-        Date hastaFecha = null;
+        // fechas[0] = desdeFecha // fechas[1] = hastaFecha
+        Date[] fechas = this.estudioService.parseFiltroEstudioFechas(strDesdeFecha, strHastaFecha);
 
         String ordenarporfecha = request.getParameter("ordenporfecha");
-
-        try {
-            desdeFecha = (strDesdeFecha != null && !strDesdeFecha.isEmpty()) ? formatoFecha.parse(strDesdeFecha) : formatoFecha.parse("2000-01-01");
-            hastaFecha = (strHastaFecha != null && !strHastaFecha.isEmpty()) ? formatoFecha.parse(strHastaFecha) : new Date();
-        } catch (ParseException ex) {
-            Logger.getLogger(ServletAnalistaListar.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        if (ordenarporfecha == null || ordenarporfecha.equals("desdeprimeros")) {
-            lista = this.estudioFacade.findByDesdeYHasta(usuario.getId(), desdeFecha, hastaFecha);
-        } else {
-            lista = this.estudioFacade.findByDesdeYHastaOrdenFechas(usuario.getId(), desdeFecha, hastaFecha);
-        }
-
-        //request.setAttribute("actualizarTabla", null);
-        request.setAttribute("desdeFecha", desdeFecha);
-        request.setAttribute("hastaFecha", hastaFecha);
-        request.setAttribute("lista", lista);
+        
+        lista = this.estudioService.getListaEstudios(usuario.getId(), fechas[0], fechas[1], ordenarporfecha);
+       
+        request.setAttribute("desdeFecha", fechas[0]);
+        request.setAttribute("hastaFecha", fechas[1]);
+        request.setAttribute("lista", lista); 
 
         RequestDispatcher rd = request.getRequestDispatcher("analistaVerEstudios.jsp");
         rd.forward(request, response);
