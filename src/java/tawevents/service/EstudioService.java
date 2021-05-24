@@ -65,4 +65,12 @@ public class EstudioService {
         }
         return fechas;
     }
+
+    public void eliminarEstudio(String strID) {
+        Integer id = Integer.parseInt(strID);
+        Estudio estudio = this.estudioFacade.find(id);
+        if (estudio != null) {
+            this.estudioFacade.remove(estudio);
+        }
+    }
 }

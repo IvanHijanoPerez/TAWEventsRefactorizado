@@ -6,7 +6,6 @@
 package tawevents.servlet;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -16,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import tawevents.dao.EstudioFacade;
 import tawevents.entity.Estudio;
+import tawevents.service.EstudioService;
 
 /**
  *
@@ -26,6 +26,9 @@ public class ServletAnalistaEliminar extends HttpServlet {
 
     @EJB
     private EstudioFacade estudioFacade;
+
+    @EJB
+    private EstudioService estudioService;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -45,23 +48,21 @@ public class ServletAnalistaEliminar extends HttpServlet {
 
         if (confirmacion == null || strID == null || confirmacion.equals("n")) {
             // No elimino nada
-            request.setAttribute("confirmacion", null);
-            request.setAttribute("id", null);
+            confirmacion = null;
+            strID = null;
 
         } else if (confirmacion.equals("y")) {
             // Elimino estudio
-            Integer id = Integer.parseInt(strID);
-            Estudio estudio = this.estudioFacade.find(id);
-            if (estudio != null) {
-                this.estudioFacade.remove(estudio);
-            }
-            
+            this.estudioService.eliminarEstudio(strID);
+            confirmacion = null;
+            strID = null;
+
         } else { //confirmacion = "idk";
             // Hay que confirmar si es seguro eliminar el estudio
-            request.setAttribute("confirmacion", confirmacion);
-            request.setAttribute("id", strID);
         }
 
+        request.setAttribute("confirmacion", confirmacion);
+        request.setAttribute("id", strID);
         RequestDispatcher rd = request.getRequestDispatcher("ServletAnalistaListar");
         rd.forward(request, response);
     }
