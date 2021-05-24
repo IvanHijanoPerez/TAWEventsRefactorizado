@@ -16,7 +16,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import tawevents.dao.UsuarioFacade;
+import tawevents.dto.UsuarioDTO;
 import tawevents.entity.Usuario;
+import tawevents.service.UsuarioService;
 
 /**
  *
@@ -26,7 +28,7 @@ import tawevents.entity.Usuario;
 public class ServletInicioAutenticar extends HttpServlet {
 
     @EJB
-    private UsuarioFacade usuarioFacade;
+    private UsuarioService usuarioService;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -41,11 +43,11 @@ public class ServletInicioAutenticar extends HttpServlet {
             throws ServletException, IOException {
         String strNick = request.getParameter("nick");
         String strClave = request.getParameter("contrasena");
-        Usuario usuario;
+        UsuarioDTO usuario;
         String strError = "", strTo = "";
         HttpSession session = request.getSession();
 
-        Usuario usuarioRegistrado = (Usuario) session.getAttribute("usuario");
+        UsuarioDTO usuarioRegistrado = (UsuarioDTO) session.getAttribute("usuario");
         if (usuarioRegistrado == null) {
             if (strNick == null || strNick.isEmpty()
                     || strClave == null || strClave.isEmpty()) {  // Error de autenticación por email o clave
@@ -55,7 +57,7 @@ public class ServletInicioAutenticar extends HttpServlet {
                 strTo = "inicioSesion.jsp";
 
             } else {
-                usuario = this.usuarioFacade.findByNickAndPassword(strNick, strClave);
+                usuario = this.usuarioService.comprobarCredenciales(strNick, strClave);
                 if (usuario == null) { // No hay usuario en la BD
                     strError = "Error de autenticación: credenciales incorrectas";
                     request.setAttribute("error", strError);

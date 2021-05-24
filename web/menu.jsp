@@ -4,7 +4,7 @@
     Author     : Ivan
 --%>
 
-<%@page import="tawevents.entity.Usuario"%>
+<%@page import="tawevents.dto.UsuarioDTO"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -16,7 +16,7 @@
         <link rel="stylesheet" href="menuCSS.css">
     </head>
     <%
-        Usuario usuario = (Usuario)session.getAttribute("usuario");
+        UsuarioDTO usuario = (UsuarioDTO)session.getAttribute("usuario");
         if (usuario == null) {
     %>        
     <jsp:forward page="inicioSesion.jsp" />

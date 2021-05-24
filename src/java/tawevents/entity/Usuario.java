@@ -25,6 +25,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import tawevents.dto.UsuarioDTO;
 
 /**
  *
@@ -179,6 +180,18 @@ public class Usuario implements Serializable {
     @Override
     public String toString() {
         return "tawevents.entity.Usuario[ id=" + id + " ]";
+    }
+    
+    public UsuarioDTO getDTO() {
+        UsuarioDTO dto = new UsuarioDTO();
+        dto.setId(id);
+        dto.setNickname(nickname);
+        dto.setContrasena(contrasena);
+        dto.setTipoUsuario(tipoUsuario);
+        if(usuarioDeEventos != null){
+            dto.setUsuarioDeEventos(usuarioDeEventos.getId());
+        }
+        return dto;
     }
     
 }
