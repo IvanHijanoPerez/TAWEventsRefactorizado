@@ -252,7 +252,7 @@ public class Evento implements Serializable {
         for(Etiqueta e : this.getEtiquetaList()){
             str = str + e.getNombre() + " ";
         }
-        return str.substring(0, str.length()-1);
+        return str;
     }
      
     public void setUsuario(Usuario usuario) {

@@ -61,7 +61,7 @@ public class ServletEventoGuardar extends HttpServlet {
         
         String titulo, descripcion, imagen, aforo_maximo, maximo_entradas_usuario, asientos_asignados, numero_filas, asientos_por_fila, precio, etiquetas;
         
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-dd");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         Date fecha = null;
         Date fecha_limite_entradas = null;
         Evento evento = new Evento();

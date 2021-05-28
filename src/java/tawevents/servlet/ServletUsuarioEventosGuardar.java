@@ -67,12 +67,24 @@ public class ServletUsuarioEventosGuardar extends HttpServlet {
             // Asignamos valores
             id = request.getParameter("id");
             nick = request.getParameter("nick");
+            if(nick != null){
+            nick = new String(request.getParameter("nick").getBytes("ISO-8859-1"), "UTF-8"); 
+            }
             correoElectronico = request.getParameter("correoElectronico");
             contrasena = request.getParameter("contrasena");
             confirmarContrasena = request.getParameter("confirmarContrasena");
             nombre = request.getParameter("nombre");
+            if(nombre != null){
+            nombre = new String(request.getParameter("nombre").getBytes("ISO-8859-1"), "UTF-8"); 
+            }
             apellidos = request.getParameter("apellidos");
+            if(apellidos != null){
+            apellidos = new String(request.getParameter("apellidos").getBytes("ISO-8859-1"), "UTF-8"); 
+            }
             ciudad = request.getParameter("ciudad");
+            if(ciudad != null){
+            ciudad = new String(request.getParameter("ciudad").getBytes("ISO-8859-1"), "UTF-8"); 
+            }
             sexo = request.getParameter("sexo");
             try {
                 fechaNacimiento = new SimpleDateFormat("yyyy-MM-dd").parse(request.getParameter("fechaNacimiento"));
