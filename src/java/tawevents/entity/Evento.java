@@ -6,6 +6,7 @@
 package tawevents.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Basic;
@@ -29,6 +30,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import tawevents.dto.EventoDTO;
+import tawevents.dto.UsuarioDTO;
 
 /**
  *
@@ -282,6 +285,40 @@ public class Evento implements Serializable {
     @Override
     public String toString() {
         return "tawevents.entity.Evento[ id=" + id + " ]";
+    }
+    
+     public EventoDTO getDTO() {
+        EventoDTO dto = new EventoDTO();
+        dto.setId(id);
+        dto.setTitulo(titulo);
+        dto.setImagen(imagen);
+        dto.setDescripcion(descripcion);
+        dto.setFecha(fecha);
+        dto.setFechaLimEntradas(fechaLimEntradas);
+        dto.setPrecioEntrada(precioEntrada);
+        dto.setAforoMax(aforoMax);
+        dto.setMaxEntradasPorUsuario(maxEntradasPorUsuario);
+        dto.setAsientosAsignados(asientosAsignados);
+        dto.setNumFilas(numFilas);
+        dto.setAsientosPorFila(asientosPorFila);
+        
+        List<Integer> etList = new ArrayList<>();
+        for(Etiqueta e : etiquetaList){
+            etList.add(e.getId());
+        }
+        dto.setEtiquetaList(etList);
+        
+        List<Integer> puList = new ArrayList<>();
+        for(Publico p : publicoList){
+            puList.add(p.getId());
+        }
+        dto.setPublicoList(puList);
+        
+        if(usuario != null){
+            dto.setUsuario(usuario.getId());
+        }
+        
+        return dto;
     }
     
 }
