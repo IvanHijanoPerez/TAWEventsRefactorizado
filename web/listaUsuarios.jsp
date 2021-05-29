@@ -4,8 +4,8 @@
     Author     : Ivan
 --%>
 
+<%@page import="tawevents.dto.UsuarioDTO"%>
 <%@page import="java.util.List"%>
-<%@page import="tawevents.entity.Usuario"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -21,14 +21,14 @@
         <title>Usuarios</title>
     </head>
     <%
-        Usuario usuario = (Usuario)session.getAttribute("usuario");
+        UsuarioDTO usuario = (UsuarioDTO)session.getAttribute("usuario");
         if (usuario == null) {
     %>        
     <jsp:forward page="inicioSesion.jsp" />
         
     <%
         }
-        List<Usuario> lista = (List)request.getAttribute("lista");
+        List<UsuarioDTO> lista = (List)request.getAttribute("lista");
     %>
     <body onload="myFunction()">
         <img src="Imagenes/tawevents-logo.png" class="imagen-corporativa">
@@ -70,7 +70,7 @@
                         </thead>
                         <tbody>
                             <%
-                                for (Usuario us:lista) {
+                                for (UsuarioDTO us:lista) {
                             %>   
                             <tr>
                                 <td><%= us.getNickname() %></td>

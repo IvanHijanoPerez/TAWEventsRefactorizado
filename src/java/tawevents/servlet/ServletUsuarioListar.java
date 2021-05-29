@@ -15,8 +15,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import tawevents.dao.UsuarioFacade;
-import tawevents.entity.Usuario;
+import tawevents.dto.UsuarioDTO;
+import tawevents.service.UsuarioService;
 
 /**
  *
@@ -24,9 +24,10 @@ import tawevents.entity.Usuario;
  */
 @WebServlet(name = "ServletUsuarioListar", urlPatterns = {"/ServletUsuarioListar"})
 public class ServletUsuarioListar extends HttpServlet {
-    
+
     @EJB
-    private UsuarioFacade usuarioFacade;
+    private UsuarioService usuarioService;
+    
     
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -40,7 +41,7 @@ public class ServletUsuarioListar extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        List<Usuario> lista;
+        List<UsuarioDTO> lista;
         
         String tipoFiltro = request.getParameter("tipoFiltro");
         String filtro = request.getParameter("filtro");
@@ -50,15 +51,15 @@ public class ServletUsuarioListar extends HttpServlet {
         
         if ((filtro != null && filtro.length()>0 )) {
             if(tipoFiltro.equals("fNick")){
-                lista = this.usuarioFacade.findBySimilarNick(filtro);
+                lista = this.usuarioService.filtroNick(filtro);
             }else if(tipoFiltro.equals("fContrasena")){
-                lista = this.usuarioFacade.findBySimilarContrasena(filtro);
+                lista = this.usuarioService.filtroContrasena(filtro);
             }else{
-                lista = this.usuarioFacade.findBySimilarTipoUsuario(filtro);
+                lista = this.usuarioService.filtroTipoUsuario(filtro);
             }
             
         }else{
-            lista = this.usuarioFacade.findAll();
+            lista = this.usuarioService.TodosUsuarios();
         }
         
         request.setAttribute("lista", lista);

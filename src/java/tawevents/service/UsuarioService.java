@@ -5,6 +5,8 @@
  */
 package tawevents.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import tawevents.dao.UsuarioFacade;
@@ -30,5 +32,51 @@ public class UsuarioService {
         }else{
             return null;
         }
+    }
+    
+    protected List<UsuarioDTO> convertirAListaDTO (List<Usuario> lista) {
+        if (lista != null) {
+            List<UsuarioDTO> listaDTO = new ArrayList<UsuarioDTO>();
+            for (Usuario usuario:lista) {
+                listaDTO.add(usuario.getDTO());
+            }
+            return listaDTO;            
+        } else {
+            return null;
+        }        
+    }
+    
+    public List<UsuarioDTO> filtroNick(String nick){
+        List<Usuario> usuarios = usuarioFacade.findBySimilarNick(nick);
+        return convertirAListaDTO(usuarios);
+    }
+    
+    public List<UsuarioDTO> filtroContrasena(String contra){
+        List<Usuario> usuarios = usuarioFacade.findBySimilarContrasena(contra);
+        return convertirAListaDTO(usuarios);
+    }
+    
+    public List<UsuarioDTO> filtroTipoUsuario(String tipo){
+        List<Usuario> usuarios = usuarioFacade.findBySimilarTipoUsuario(tipo);
+        return convertirAListaDTO(usuarios);
+    }
+    
+    public List<UsuarioDTO> TodosUsuarios(){
+        List<Usuario> usuarios = usuarioFacade.findAll();
+        return convertirAListaDTO(usuarios);
+    }
+    
+    public UsuarioDTO buscarUsuario (Integer id) {
+        Usuario usuario = this.usuarioFacade.find(id);
+        if (usuario != null) {
+            return usuario.getDTO();
+        } else {
+            return null;
+        }
+    }
+    
+    public void borrarUsuario (Integer id) {
+        Usuario usuario = this.usuarioFacade.find(id);
+        this.usuarioFacade.remove(usuario);
     }
 }

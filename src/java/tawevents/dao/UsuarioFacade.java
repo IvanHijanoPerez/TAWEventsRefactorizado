@@ -94,5 +94,5 @@ public class UsuarioFacade extends AbstractFacade<Usuario> {
         q.setParameter("tipo", "%" + filtro + "%");
         return q.getResultList();
     }
-
+    
 }

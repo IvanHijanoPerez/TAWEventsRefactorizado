@@ -15,8 +15,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import tawevents.dao.UsuarioFacade;
-import tawevents.entity.Usuario;
+import tawevents.dto.UsuarioDTO;
+import tawevents.service.UsuarioService;
 
 /**
  *
@@ -26,7 +26,9 @@ import tawevents.entity.Usuario;
 public class ServletUsuarioBorrar extends HttpServlet {
 
     @EJB
-    private UsuarioFacade usuarioFacade;
+    private UsuarioService usuarioService;
+
+    
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -40,7 +42,7 @@ public class ServletUsuarioBorrar extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Usuario usuario = (Usuario)session.getAttribute("usuario");
+        UsuarioDTO usuario = (UsuarioDTO)session.getAttribute("usuario");
         if (usuario == null) {
             request.setAttribute("errorRegistro", "Usuario no autenticado");
             RequestDispatcher rd = request.getRequestDispatcher("inicioSesion.jsp");
@@ -48,13 +50,13 @@ public class ServletUsuarioBorrar extends HttpServlet {
         } else {                
             String strId = request.getParameter("id");
 
-            Usuario elUsuario = this.usuarioFacade.find(new Integer(strId));
+            UsuarioDTO elUsuario = this.usuarioService.buscarUsuario(new Integer(strId));
                if(usuario.getNickname().equals(elUsuario.getNickname())){
-                   this.usuarioFacade.remove(elUsuario);
+                   this.usuarioService.borrarUsuario(new Integer(strId));
                    session.invalidate();
                    response.sendRedirect("inicioSesion.jsp");
                }else{
-                   this.usuarioFacade.remove(elUsuario);
+                   this.usuarioService.borrarUsuario(new Integer(strId));
                    response.sendRedirect("ServletUsuarioListar"); 
                }
                    
