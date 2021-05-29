@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import tawevents.dao.EtiquetaFacade;
 import tawevents.dao.EventoFacade;
+import tawevents.dto.UsuarioDTO;
 import tawevents.entity.Etiqueta;
 import tawevents.entity.Evento;
 import tawevents.entity.Usuario;
@@ -46,9 +47,9 @@ public class ServletCreadorDeEventosListar extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        Usuario usuario;
+        UsuarioDTO usuario;
         HttpSession session = request.getSession();
-        usuario = (Usuario) session.getAttribute("usuario");
+        usuario = (UsuarioDTO) session.getAttribute("usuario");
         
         String filtro = request.getParameter("filtro");
         if(filtro != null && filtro.length() > 0){
