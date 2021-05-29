@@ -18,9 +18,15 @@ import javax.servlet.http.HttpSession;
 import tawevents.dao.EtiquetaFacade;
 import tawevents.dao.EventoFacade;
 import tawevents.dao.UsuarioFacade;
+import tawevents.dto.EtiquetaDTO;
+import tawevents.dto.EventoDTO;
+import tawevents.dto.UsuarioDTO;
 import tawevents.entity.Etiqueta;
 import tawevents.entity.Evento;
 import tawevents.entity.Usuario;
+import tawevents.service.EventoService;
+import tawevents.service.EtiquetaService;
+import tawevents.service.UsuarioService;
 
 /**
  *
@@ -28,16 +34,14 @@ import tawevents.entity.Usuario;
  */
 @WebServlet(name = "ServletCreadorDeEventosBorrar", urlPatterns = {"/ServletCreadorDeEventosBorrar"})
 public class ServletCreadorDeEventosBorrar extends HttpServlet {
-
     @EJB
-    private EventoFacade eventoFacade;
+    private EventoService eventoService;
     
     @EJB
-    private UsuarioFacade usuarioFacade;
+    private EtiquetaService etiquetaService;
     
-     @EJB
-    private EtiquetaFacade etiquetaFacade;
-    
+    @EJB
+    private UsuarioService usuarioService;
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -51,26 +55,25 @@ public class ServletCreadorDeEventosBorrar extends HttpServlet {
             throws ServletException, IOException {
         
        HttpSession session = request.getSession();
-       Usuario usuario = (Usuario)session.getAttribute("usuario");
+       UsuarioDTO usuario = (UsuarioDTO)session.getAttribute("usuario");
 
-            Evento eventoABorrar = this.eventoFacade.find(Integer.parseInt(request.getParameter("idE")));
+            EventoDTO eventoABorrar = eventoService.find(Integer.parseInt(request.getParameter("idE")));
             
-            for(Etiqueta e : eventoABorrar.getEtiquetaList()){
-                List<Evento> eventoList = e.getEventoList();
+            for(EtiquetaDTO e : etiquetaService.convertirAListaDTOdirectamente(eventoABorrar.getEtiquetaList())){
+                List<EventoDTO> eventoList = eventoService.convertirAListaDTOdirectamente(e.getEventoList());
                 eventoList.remove(eventoABorrar);
                 if(eventoList.isEmpty()){
-                    etiquetaFacade.remove(e);
+                    etiquetaService.remove(e);
                 }else{
-                    e.setEventoList(eventoList);
-                     etiquetaFacade.edit(e);
+                    e.setEventoList(eventoService.convertirALaInversa(eventoList));
+                    etiquetaService.edit(e);
                 }
             }
-            
-            this.eventoFacade.remove(eventoABorrar);
+            eventoService.remove(eventoABorrar);
             
             List eventosList = usuario.getEventoList();
-            eventosList.remove(eventoABorrar);
-            usuarioFacade.edit(usuario); 
+            eventosList.remove(eventoABorrar.getId());
+            usuarioService.edit(usuario);
             
             response.sendRedirect("ServletCreadorDeEventosListar"); 
     }

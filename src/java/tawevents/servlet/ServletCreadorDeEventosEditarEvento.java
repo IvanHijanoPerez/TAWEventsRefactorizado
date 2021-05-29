@@ -15,7 +15,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import tawevents.dao.EventoFacade;
+import tawevents.dto.EventoDTO;
 import tawevents.entity.Evento;
+import tawevents.service.EventoService;
 
 /**
  *
@@ -25,7 +27,7 @@ import tawevents.entity.Evento;
 public class ServletCreadorDeEventosEditarEvento extends HttpServlet {
 
     @EJB
-    private EventoFacade eventoFacade;
+    private EventoService eventoService;
     
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -39,7 +41,7 @@ public class ServletCreadorDeEventosEditarEvento extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         int idEvento = Integer.parseInt(request.getParameter("idE"));
-        Evento evento = eventoFacade.find(idEvento);
+        EventoDTO evento = eventoService.find(idEvento);
         request.setAttribute("evento", evento);
         
         RequestDispatcher rd = request.getRequestDispatcher("editarEventoCreadorDeEventos.jsp");

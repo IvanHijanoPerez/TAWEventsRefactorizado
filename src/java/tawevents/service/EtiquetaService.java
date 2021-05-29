@@ -27,6 +27,10 @@ public class EtiquetaService {
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
      
+     public List<EtiquetaDTO> convertirAListaDTOdirectamente(List<Integer> lista){
+         return this.convertirAListaDTO(this.convertirAListaEtiqueta(lista));
+     }
+     
      public List<EtiquetaDTO> convertirAListaDTO(List<Etiqueta> lista){
          if (lista != null) {
             List<EtiquetaDTO> listaDTO = new ArrayList<>();
@@ -52,8 +56,18 @@ public class EtiquetaService {
         
      }
      
+     
+     
      public EtiquetaDTO findBySimilarNombre(String nombre){
          EtiquetaDTO et = etiquetaFacade.findBySimilarNombre(nombre).getDTO();
          return et;
+     }
+     
+     public void remove(EtiquetaDTO e){
+         etiquetaFacade.remove(etiquetaFacade.find(e.getId()));
+     }
+     
+     public void edit(EtiquetaDTO e){
+         etiquetaFacade.edit(etiquetaFacade.find(e.getId()));
      }
 }

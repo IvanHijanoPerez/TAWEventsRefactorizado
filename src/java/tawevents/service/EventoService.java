@@ -10,6 +10,7 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import tawevents.dao.EventoFacade;
+import tawevents.dto.EtiquetaDTO;
 import tawevents.dto.EventoDTO;
 import tawevents.dto.UsuarioDTO;
 import tawevents.entity.Evento;
@@ -25,6 +26,11 @@ public class EventoService {
      private EventoFacade eventoFacade;
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
+     
+     
+     public List<EventoDTO> convertirAListaDTOdirectamente(List<Integer> lista){
+         return this.convertirAListaDTO(this.convertirAListaEvento(lista));
+     }
      
      public List<EventoDTO> convertirAListaDTO(List<Evento> lista){
          if (lista != null) {
@@ -51,8 +57,24 @@ public class EventoService {
         
      }
      
+     public List<Integer> convertirALaInversa (List<EventoDTO> lista){
+        List<Integer> res = new ArrayList<>();
+        for(EventoDTO e : lista){
+            res.add(e.getId());
+        }
+        return res;
+    }
+     
      public List<EventoDTO> findByTitulo(String titulo){
          List <Evento> lista = eventoFacade.findByTitulo(titulo);
          return convertirAListaDTO(lista);
+     }
+     
+     public EventoDTO find(int id){
+         return eventoFacade.findById(id).getDTO();
+     }
+     
+     public void remove(EventoDTO e){
+         eventoFacade.remove(eventoFacade.find(e.getId()));
      }
 }

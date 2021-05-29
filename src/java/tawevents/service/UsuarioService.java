@@ -10,6 +10,7 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import tawevents.dao.UsuarioFacade;
+import tawevents.dto.EtiquetaDTO;
 import tawevents.dto.UsuarioDTO;
 import tawevents.entity.Usuario;
 
@@ -88,6 +89,10 @@ public class UsuarioService {
         Usuario usuario = this.usuarioFacade.find(id);
         this.usuarioFacade.remove(usuario);
     }
+    
+    public void edit(UsuarioDTO e){
+         usuarioFacade.edit(usuarioFacade.find(e.getId()));
+     }
     
     public void guardarUsuario (String id, String nickname,  String contrasena, 
              String tipoUsuario) {

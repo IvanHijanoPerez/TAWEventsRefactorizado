@@ -4,13 +4,14 @@
     Author     : rafar
 --%>
 
+<%@page import="tawevents.dto.EventoDTO"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="tawevents.entity.Evento"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
     <%
-        Evento evento = (Evento) request.getAttribute("evento");
+        EventoDTO evento = (EventoDTO) request.getAttribute("evento");
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
     %>
     <head>
