@@ -8,10 +8,13 @@ package tawevents.servlet;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -19,8 +22,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import tawevents.dao.EstudioFacade;
+import tawevents.dto.EstudioDTO;
+import tawevents.dto.UsuarioDTO;
 import tawevents.entity.Estudio;
 import tawevents.entity.Usuario;
+import tawevents.service.EstudioService;
 
 /**
  *
@@ -30,7 +36,7 @@ import tawevents.entity.Usuario;
 public class ServletAnalistaCrearEstudio extends HttpServlet {
 
     @EJB
-    private EstudioFacade estudioFacade;
+    private EstudioService estudioService;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -44,120 +50,42 @@ public class ServletAnalistaCrearEstudio extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        
+
+        // Comprobar que el usuario está conectado y es analita de eventos
         HttpSession session = request.getSession();
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        UsuarioDTO usuario = (UsuarioDTO) session.getAttribute("usuario");
+
+        if (usuario == null || !usuario.getTipoUsuario().equals("analistadeeventos")) {
+            RequestDispatcher rd = request.getRequestDispatcher("inicioSesion.jsp");
+            rd.forward(request, response);
+        }
+        List<String> datos = new ArrayList<>();
+        
+        datos.add(request.getParameter("titulo")); // 0
+        datos.add(request.getParameter("desdeFecha")); // 1
+        datos.add(request.getParameter("hastaFecha")); // 2
+        datos.add(request.getParameter("event_fin")); // 3
+        datos.add(request.getParameter("asient_asig")); // 4
+        datos.add(""); // 5 Hueco para etiquetas
+        datos.add(request.getParameter("aforo_min")); // 6
+        datos.add(request.getParameter("aforo_max")); // 7   
+        datos.add(request.getParameter("sexo")); // 8
+        datos.add(request.getParameter("ciudad")); // 9
+        datos.add(request.getParameter("edad_min")); // 10
+        datos.add(request.getParameter("edad_max")); // 11
+        datos.add(request.getParameter("nombre")); // 12
+        datos.add(request.getParameter("apellidos")); // 13
+        datos.add(request.getParameter("tipousuario")); // 14
 
         //DESCRIPCION NO PUEDE ESTAR VACIA
-        String descripcion = request.getParameter("descripcion");
-        descripcion = new String(descripcion.getBytes("ISO8859-1"), "UTF8");
-        
-        String titulo = request.getParameter("titulo"); //
-        titulo = ((titulo.isEmpty()) ? "-" : new String(titulo.getBytes("ISO8859-1"), "UTF8"));
-        String desdeFecha = request.getParameter("desdeFecha"); //
-        desdeFecha = ((desdeFecha.isEmpty()) ? "-" : desdeFecha);
-        String hastaFecha = request.getParameter("hastaFecha"); //
-        hastaFecha = ((hastaFecha.isEmpty()) ? "-" : hastaFecha);
-        String event_fin = request.getParameter("event_fin"); //
-        event_fin = ((event_fin == null) ? "-" : event_fin);
-        String asient_asig = request.getParameter("asient_asig"); //
-        asient_asig = ((asient_asig == null) ? "-" : asient_asig);
-        // Hueco para etiquetas
-        String aforo_min = request.getParameter("aforo_min"); // 
-        aforo_min = ((aforo_min.isEmpty()) ? "-" : aforo_min);
-        String aforo_max = request.getParameter("aforo_max"); //
-        aforo_max = ((aforo_max.isEmpty()) ? "-" : aforo_max);
-        String sexo = request.getParameter("sexo"); //
-        sexo = ((sexo == null) ? "-" : sexo);
-        String ciudad = request.getParameter("ciudad"); //
-        ciudad = ((ciudad == null) ? "" : ciudad);
-        ciudad = ((ciudad.isEmpty()) ? "-" : new String(ciudad.getBytes("ISO8859-1"), "UTF8"));
-        String edad_min = request.getParameter("edad_min"); //
-        edad_min = ((edad_min.isEmpty()) ? "-" : edad_min);
-        String edad_max = request.getParameter("edad_max"); //
-        edad_max = ((edad_max.isEmpty()) ? "-" : edad_max);
-        // CONTROLAR ERRORES - Edad < 0, edad min > edad max - ...
-        String nombre = request.getParameter("nombre"); //
-        nombre = ((nombre.isEmpty()) ? "-" : new String(nombre.getBytes("ISO8859-1"), "UTF8"));
-        String apellidos = request.getParameter("apellidos"); //
-        apellidos = ((apellidos.isEmpty()) ? "-" : new String(apellidos.getBytes("ISO8859-1"), "UTF8"));
-        String tipousuario = request.getParameter("tipousuario");
-        tipousuario = ((tipousuario == null) ? "-" : tipousuario);
+        String descripcion = request.getParameter("descripcion"); // 15
+        if (descripcion == null) {
+            RequestDispatcher rd = request.getRequestDispatcher("analistaEstudio.jsp");
+            rd.forward(request, response);
+        }
+        datos.add(descripcion); // 15
 
-        // Compruebo y arreglo las fechas
-        SimpleDateFormat formatoFecha = new SimpleDateFormat("yyyy-MM-dd");
-        Date desdeF;
-        Date hastaF;
-        try {
-            if (!desdeFecha.equals("-") && !hastaFecha.equals("-")) {
-                desdeF = formatoFecha.parse(desdeFecha);
-                hastaF = formatoFecha.parse(hastaFecha);
-                if (desdeF.after(hastaF)) {
-                    String aux = hastaFecha;
-                    hastaFecha = desdeFecha;
-                    desdeFecha = aux;
-                }
-            }
-        } catch (ParseException ex) {
-            Logger.getLogger(ServletAnalistaCrearEstudio.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        // Compruebo y arreglo los aforos mínimo y máximo
-        if (!aforo_min.equals("-") && new Integer(aforo_min) < 0) {
-            aforo_min = "-";
-        }
-        if (!aforo_max.equals("-") && new Integer(aforo_max) < 0) {
-            aforo_max = "-";
-        }
-        if (!aforo_min.equals("-") && !aforo_max.equals("-")) {
-            if (new Integer(aforo_min) > new Integer(aforo_max)) {
-                String aux = aforo_min;
-                aforo_min = aforo_max;
-                aforo_max = aux;
-            }
-        }
-        
-        // Compruebo y arreglo las edades mínima y máxima
-        if (!edad_min.equals("-") && new Integer(edad_min) < 0) {
-            edad_min = "-";
-        }
-        if (!edad_max.equals("-") && new Integer(edad_max) < 0) {
-            edad_max = "-";
-        }
-        if (!edad_min.equals("-") && !edad_max.equals("-")) {
-            if (new Integer(edad_min) > new Integer(edad_max)) {
-                String aux = edad_min;
-                edad_min = edad_max;
-                edad_max = aux;
-            }
-        }
-
-        // Unir datos
-        StringBuilder busqueda = new StringBuilder("");
-        busqueda.append(titulo).append(",");
-        busqueda.append(desdeFecha).append(",");
-        busqueda.append(hastaFecha).append(",");
-        busqueda.append(event_fin).append(",");
-        busqueda.append(asient_asig).append(",");
-        busqueda.append("-,"); //etiquetas
-        busqueda.append(aforo_min).append(",");
-        busqueda.append(aforo_max).append(",");
-        busqueda.append(sexo).append(",");
-        busqueda.append(ciudad).append(",");
-        busqueda.append(edad_min).append(",");
-        busqueda.append(edad_max).append(",");
-        busqueda.append(nombre).append(",");
-        busqueda.append(apellidos).append(",");
-        busqueda.append(tipousuario);
-
-        // Creo e inserto el nuevo estudio
-        Estudio estudio = new Estudio();
-        estudio.setAnalista(usuario);
-        estudio.setFecha(new Date());
-        estudio.setDescripcion(descripcion);
-        estudio.setBusqueda(busqueda.toString());
-
-        this.estudioFacade.create(estudio);
+        this.estudioService.arreglarDatosYGuardarEstudio(usuario.getId(), datos);
 
         response.sendRedirect("ServletAnalistaListar");
     }
@@ -200,5 +128,4 @@ public class ServletAnalistaCrearEstudio extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
 }

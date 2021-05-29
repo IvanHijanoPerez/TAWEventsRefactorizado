@@ -13,8 +13,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import tawevents.dao.EstudioFacade;
-import tawevents.entity.Estudio;
+import javax.servlet.http.HttpSession;
+import tawevents.dto.UsuarioDTO;
 import tawevents.service.EstudioService;
 
 /**
@@ -23,9 +23,6 @@ import tawevents.service.EstudioService;
  */
 @WebServlet(name = "ServletAnalistaEliminar", urlPatterns = {"/ServletAnalistaEliminar"})
 public class ServletAnalistaEliminar extends HttpServlet {
-
-    @EJB
-    private EstudioFacade estudioFacade;
 
     @EJB
     private EstudioService estudioService;
@@ -42,6 +39,15 @@ public class ServletAnalistaEliminar extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+
+        // Comprobar que el usuario está conectado y es analita de eventos
+        HttpSession session = request.getSession();
+        UsuarioDTO usuario = (UsuarioDTO) session.getAttribute("usuario");
+
+        if (usuario == null || !usuario.getTipoUsuario().equals("analistadeeventos")) {
+            RequestDispatcher rd = request.getRequestDispatcher("inicioSesion.jsp");
+            rd.forward(request, response);
+        }
 
         String confirmacion = request.getParameter("confirmacion");
         String strID = request.getParameter("id");
@@ -63,6 +69,7 @@ public class ServletAnalistaEliminar extends HttpServlet {
 
         request.setAttribute("confirmacion", confirmacion);
         request.setAttribute("id", strID);
+        
         RequestDispatcher rd = request.getRequestDispatcher("ServletAnalistaListar");
         rd.forward(request, response);
     }

@@ -4,6 +4,7 @@
     Author     : daniel
 --%>
 
+<%@page import="tawevents.dto.UsuarioDTO"%>
 <%@page import="tawevents.entity.Usuario"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -17,7 +18,7 @@
         <title> Analista de Eventos - Home </title>
     </head>
     <%
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        UsuarioDTO usuario = (UsuarioDTO) session.getAttribute("usuario");
         if (usuario == null) {
     %>        
     <jsp:forward page="inicioSesion.jsp" />   

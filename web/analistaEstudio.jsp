@@ -4,13 +4,14 @@
     Author     : daniel
 --%>
 
+<%@page import="tawevents.dto.EstudioDTO"%>
+<%@page import="tawevents.dto.UsuarioDTO"%>
 <%@page import="java.util.Set"%>
 <%@page import="tawevents.entity.UsuarioDeEventos"%>
 <%@page import="java.util.List"%>
 <%@page import="tawevents.entity.Etiqueta"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="tawevents.entity.Usuario"%>
-<%@page import="tawevents.entity.Estudio"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -23,8 +24,8 @@
         <title> Analista - Estudio </title>
     </head>
     <%
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
-        if (usuario == null) {
+        UsuarioDTO usuario = (UsuarioDTO) session.getAttribute("usuario");
+        if (usuario == null || !usuario.getTipoUsuario().equals("analistadeeventos")) {
     %>
     <jsp:forward page="inicioSesion.jsp" /> 
     <%
@@ -35,7 +36,7 @@
         String fechaEstudio = "";
 
         String modo = (String) request.getAttribute("modo");
-        Estudio estudio = (Estudio) request.getAttribute("estudio");
+        EstudioDTO estudio = (EstudioDTO) request.getAttribute("estudio");
         List<String> datos = (List<String>) request.getAttribute("datos");
         List<Usuario> resultados = (List<Usuario>) request.getAttribute("resultados");
         Set<String> ciudades = (Set<String>) request.getAttribute("ciudades");
@@ -130,25 +131,31 @@
                                 <div class="col">
                                     Sexo:
                                     <div id="filtrosexo">
-                                        <input type="radio" name="sexo" value="m" id="mujer" <%=disabled%> <%=(datos.get(8).equals("mujer") ? "checked" : "")%>/> Mujer <br/>
-                                        <input type="radio" name="sexo" value="h" id="hombre" <%=disabled%> <%=(datos.get(8).equals("hombre") ? "checked" : "")%>/> Hombre <br/>
+                                        <input type="radio" name="sexo" value="m" id="mujer" <%=disabled%> <%=(datos.get(8).equals("m") ? "checked" : "")%>/> Mujer <br/>
+                                        <input type="radio" name="sexo" value="h" id="hombre" <%=disabled%> <%=(datos.get(8).equals("h") ? "checked" : "")%>/> Hombre <br/>
                                         <input type="radio" name="sexo" value="-" id="otro" <%=disabled%> <%=(datos.get(8).isEmpty() ? "checked" : "")%>/> Todos <br/>
                                     </div>
                                     <br/>
                                 </div>
                                 <div class="col">
                                     Ciudad:
-                                    <select name="ciudad" size="1" <%=disabled%> title="Si se deja en blanco no se filtra por ciudad">
-                                        <option value="<%=datos.get(9)%>" <%=disabled%>> <%=datos.get(9)%> </option>
+                                    <select name="ciudad" <%=disabled%> title="Si se deja en blanco no se filtra por ciudad">
+                                        <option value="<%=datos.get(9)%>"> <%=datos.get(9)%> </option>
                                         <%
                                             if (ciudades != null) {
                                                 for (String ciudad : ciudades) {
+                                                    if (!ciudad.equals(datos.get(9))) {
                                         %>
-                                        <option value="<%= ciudad%>" <%=disabled%>> <%= ciudad%> </option>
+                                        <option value="<%= ciudad%>"> <%= ciudad%> </option>
                                         <%
+                                        } else {
+                                        %>
+                                        <option value=""> Cualquier ciudad </option>
+                                        <%
+                                                    }
                                                 }
                                             }
-                                        %>
+                                        %>                                        
                                     </select> <br/> <br/>
                                 </div>
                             </div>
@@ -173,7 +180,7 @@
                                 <%
                                 } else {
                                 %>
-                                <option value="-"> Cualquier tipo </option>
+                                <option value=""> Cualquier tipo </option>
                                 <option value="usuariodeeventos"> Usuario de eventos</option>
                                 <option value="administrador"> Administrador </option>
                                 <option value="creadordeeventos"> Creador de eventos </option>
@@ -229,7 +236,7 @@
                             <td> <%= u.getUsuarioDeEventos().getCiudad()%> </td>
                             <td> <%= formatoFecha.format(u.getUsuarioDeEventos().getFechaNacimiento())%> </td>
                             <%
-                                } else {
+                            } else {
                             %>
                             <td> </td>
                             <td> </td>

@@ -4,6 +4,7 @@
     Author     : daniel
 --%>
 
+<%@page import="tawevents.dto.UsuarioDTO"%>
 <%@page import="tawevents.dto.EstudioDTO"%>
 <%@page import="tawevents.entity.Usuario"%>
 <%@page import="java.util.Date"%>
@@ -22,8 +23,8 @@
         <title> Analista de Eventos - Ver Estudios </title>
     </head>
     <%
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
-        if (usuario == null) {
+        UsuarioDTO usuario = (UsuarioDTO) session.getAttribute("usuario");
+        if (usuario == null || !usuario.getTipoUsuario().equals("analistadeeventos")) {
     %>
     <jsp:forward page="inicioSesion.jsp" /> 
     <%
@@ -115,6 +116,5 @@
                 </table> <br/>
             </div>
         </div>
-
     </body>
 </html>
