@@ -18,10 +18,15 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import tawevents.dao.EtiquetaFacade;
 import tawevents.dao.EventoFacade;
+import tawevents.dto.EtiquetaDTO;
+import tawevents.dto.EventoDTO;
 import tawevents.dto.UsuarioDTO;
 import tawevents.entity.Etiqueta;
 import tawevents.entity.Evento;
 import tawevents.entity.Usuario;
+import tawevents.service.EtiquetaService;
+import tawevents.service.EventoService;
+import tawevents.service.UsuarioService;
 
 /**
  *
@@ -29,13 +34,11 @@ import tawevents.entity.Usuario;
  */
 @WebServlet(name = "ServletCreadorDeEventosListar", urlPatterns = {"/ServletCreadorDeEventosListar"})
 public class ServletCreadorDeEventosListar extends HttpServlet {
+    @EJB
+    private EventoService eventoService;
     
     @EJB
-    private EventoFacade eventoFacade;
-    
-    @EJB
-    private EtiquetaFacade etiquetaFacade;
-    
+    private EtiquetaService etiquetaService;
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -53,13 +56,13 @@ public class ServletCreadorDeEventosListar extends HttpServlet {
         
         String filtro = request.getParameter("filtro");
         if(filtro != null && filtro.length() > 0){
-            List <Evento> lista = eventoFacade.findByTitulo(filtro);
-            lista.retainAll(usuario.getEventoList());
+            List <EventoDTO> lista = eventoService.findByTitulo(filtro);
+            lista.retainAll(eventoService.convertirAListaDTO(eventoService.convertirAListaEvento(usuario.getEventoList())));
             
-            Etiqueta e = etiquetaFacade.findBySimilarNombre(filtro);
+            EtiquetaDTO e = etiquetaService.findBySimilarNombre(filtro);
             if(e != null){
-                for(Evento even : e.getEventoList()){
-                    if(!lista.contains(even) && usuario.getEventoList().contains(even)){
+                for(EventoDTO even : eventoService.convertirAListaDTO(eventoService.convertirAListaEvento(e.getEventoList()))){
+                    if(!lista.contains(even) && eventoService.convertirAListaDTO(eventoService.convertirAListaEvento(usuario.getEventoList())).contains(even)){
                         lista.add(even);
                     }
                 }
@@ -67,7 +70,7 @@ public class ServletCreadorDeEventosListar extends HttpServlet {
                 
             request.setAttribute("listaEventos", lista);
         }else{ 
-            request.setAttribute("listaEventos", usuario.getEventoList());
+            request.setAttribute("listaEventos", eventoService.convertirAListaDTO(eventoService.convertirAListaEvento(usuario.getEventoList())));
         }
         request.setAttribute("usuario", usuario);
         

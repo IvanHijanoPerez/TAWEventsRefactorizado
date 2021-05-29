@@ -4,6 +4,11 @@
     Author     : rafar
 --%>
 
+<%@page import="tawevents.service.EtiquetaService"%>
+<%@page import="javax.ejb.EJB"%>
+<%@page import="tawevents.dto.EtiquetaDTO"%>
+<%@page import="tawevents.dto.UsuarioDTO"%>
+<%@page import="tawevents.dto.EventoDTO"%>
 <%@page import="tawevents.entity.Etiqueta"%>
 <%@page import="tawevents.entity.Usuario"%>
 <%@page import="java.text.SimpleDateFormat"%>
@@ -13,10 +18,10 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
-    <%
-        List<Evento> listaEventos = (List) request.getAttribute("listaEventos");
+    <%      
+        List<EventoDTO> listaEventos = (List) request.getAttribute("listaEventos");
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-        Usuario usuario = (Usuario) request.getAttribute("usuario");
+        UsuarioDTO usuario = (UsuarioDTO) request.getAttribute("usuario");
         String filtro = request.getParameter("filtro");
         if (filtro == null) {
             filtro = "";
@@ -89,7 +94,7 @@
                 <th>Borrar</th>
             </tr>        
             <%
-                for (Evento evento : listaEventos) {
+                for (EventoDTO evento : listaEventos) {
             %>    
             <tr>
                 <td><%= evento.getTitulo()%></td> 
@@ -111,9 +116,10 @@
                 <td><%= evento.getMaxEntradasPorUsuario()%></td> 
                 <td>
                   <%
-                    for(Etiqueta e : evento.getEtiquetaList()){
+                    
+                    for(Integer e : evento.getEtiquetaList()){         // for(EtiquetaDTO e : evento.getEtiquetaList()){     
                 %>
-                    <%=e.getNombre()%>
+                    <%=e%>
                     <%
                     }
                 %>

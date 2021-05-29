@@ -6,6 +6,7 @@
 package tawevents.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -21,6 +22,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import tawevents.dto.EtiquetaDTO;
+import tawevents.dto.EventoDTO;
 
 /**
  *
@@ -107,6 +110,18 @@ public class Etiqueta implements Serializable {
     @Override
     public String toString() {
         return "tawevents.entity.Etiqueta[ id=" + id + " ]";
+    }
+
+    public EtiquetaDTO getDTO() {
+        EtiquetaDTO dto = new EtiquetaDTO();
+        dto.setId(id);
+        dto.setNombre(nombre);
+        List<Integer> evList = new ArrayList<>();
+        for(Evento e : eventoList){
+            evList.add(e.getId());
+        }
+        dto.setEventoList(evList);
+        return dto;
     }
     
 }

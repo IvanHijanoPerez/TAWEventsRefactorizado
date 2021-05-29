@@ -11,25 +11,26 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import tawevents.dao.EventoFacade;
 import tawevents.dto.EventoDTO;
-import tawevents.dto.UsuarioDTO;
 import tawevents.entity.Evento;
-import tawevents.entity.Usuario;
+import tawevents.dao.EtiquetaFacade;
+import tawevents.dto.EtiquetaDTO;
+import tawevents.entity.Etiqueta;
 
 /**
  *
  * @author rafar
  */
 @Stateless
-public class EventoService {
+public class EtiquetaService {
      @EJB
-     private EventoFacade eventoFacade;
+     private EtiquetaFacade etiquetaFacade;
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
      
-     public List<EventoDTO> convertirAListaDTO(List<Evento> lista){
+     public List<EtiquetaDTO> convertirAListaDTO(List<Etiqueta> lista){
          if (lista != null) {
-            List<EventoDTO> listaDTO = new ArrayList<>();
-            for (Evento e : lista) {
+            List<EtiquetaDTO> listaDTO = new ArrayList<>();
+            for (Etiqueta e : lista) {
                 listaDTO.add(e.getDTO());
             }
             return listaDTO;            
@@ -38,21 +39,21 @@ public class EventoService {
         } 
      }
      
-     public List<Evento> convertirAListaEvento(List<Integer> lista){
-         List<Evento> listaEvento = new ArrayList<>();
+     public List<Etiqueta> convertirAListaEtiqueta(List<Integer> lista){
+         List<Etiqueta> listaEtiqueta = new ArrayList<>();
          if(lista != null ){
             for(int id : lista){
-             listaEvento.add(eventoFacade.findById(id));
+             listaEtiqueta.add(etiquetaFacade.find(id));
             }
-            return listaEvento;
+            return listaEtiqueta;
          }else{
              return null;
          }
         
      }
      
-     public List<EventoDTO> findByTitulo(String titulo){
-         List <Evento> lista = eventoFacade.findByTitulo(titulo);
-         return convertirAListaDTO(lista);
+     public EtiquetaDTO findBySimilarNombre(String nombre){
+         EtiquetaDTO et = etiquetaFacade.findBySimilarNombre(nombre).getDTO();
+         return et;
      }
 }
