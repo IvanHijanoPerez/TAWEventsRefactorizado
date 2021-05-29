@@ -5,6 +5,8 @@
  */
 package tawevents.dto;
 
+import java.util.List;
+
 /**
  *
  * @author Ivan
@@ -15,7 +17,8 @@ public class UsuarioDTO {
     private String contrasena;
     private String tipoUsuario;
     private Integer usuarioDeEventos;
-     
+    private List<Integer> eventoList;
+    
     public Integer getId() {
         return id;
     }
@@ -56,5 +59,11 @@ public class UsuarioDTO {
         this.usuarioDeEventos = usuarioDeEventos;
     }
     
-    
+    public List<Integer> getEventoList() {
+        return eventoList;
+    }
+
+    public void setEventoList(List<Integer> eventoList) {
+        this.eventoList = eventoList;
+    }
 }

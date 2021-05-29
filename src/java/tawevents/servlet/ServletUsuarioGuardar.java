@@ -15,8 +15,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import tawevents.dao.UsuarioFacade;
-import tawevents.entity.Usuario;
+import tawevents.dto.UsuarioDTO;
+import tawevents.service.UsuarioService;
 
 /**
  *
@@ -26,7 +26,7 @@ import tawevents.entity.Usuario;
 public class ServletUsuarioGuardar extends HttpServlet {
 
     @EJB
-    private UsuarioFacade usuarioFacade;
+    private UsuarioService usuarioService;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -41,7 +41,7 @@ public class ServletUsuarioGuardar extends HttpServlet {
             throws ServletException, IOException {
         String id, strNick, strClave, tipoUsuario, strClaveConf;
         String strError = "";
-        Usuario usuarioNuevo; 
+        UsuarioDTO usuarioNuevo; 
         
         id = request.getParameter("id");
         strNick = request.getParameter("nick");
@@ -53,7 +53,7 @@ public class ServletUsuarioGuardar extends HttpServlet {
         tipoUsuario = request.getParameter("tipoUsuario");
         
         HttpSession session = request.getSession();
-        Usuario usuario = (Usuario)session.getAttribute("usuario");
+        UsuarioDTO usuario = (UsuarioDTO)session.getAttribute("usuario");
         if (usuario == null) {
             request.setAttribute("errorRegistro", "Usuario no autenticado");
             RequestDispatcher rd = request.getRequestDispatcher("inicioSesion.jsp");
@@ -71,7 +71,7 @@ public class ServletUsuarioGuardar extends HttpServlet {
             } else {
                 if (id == null || id.isEmpty()) { // Crear nuevo cliente
                     
-                    Usuario i = this.usuarioFacade.findByNick(strNick);
+                    UsuarioDTO i = this.usuarioService.buscarUsuarioNick(strNick);
                     if (i == null) { // No existe usuario con ese nick 
                         if(!strClave.equals(strClaveConf)){
                             strError = "Error de creación: las contraseñas son diferentes";
@@ -79,13 +79,7 @@ public class ServletUsuarioGuardar extends HttpServlet {
                             RequestDispatcher rd = request.getRequestDispatcher("crearEditarUsuario.jsp");
                             rd.forward(request, response); 
                         }else{
-                            usuarioNuevo = new Usuario();
-                            usuarioNuevo.setId(0);
-                            usuarioNuevo.setNickname(strNick);
-                            usuarioNuevo.setContrasena(strClave);
-                            usuarioNuevo.setTipoUsuario(tipoUsuario);
-
-                            this.usuarioFacade.create(usuarioNuevo);  
+                            this.usuarioService.guardarUsuario(id, strNick, strClave, tipoUsuario);  
                             response.sendRedirect("ServletUsuarioListar"); 
                         }
                                            
@@ -98,7 +92,7 @@ public class ServletUsuarioGuardar extends HttpServlet {
                     } 
 
                 } else { // Editar cliente existente
-                    usuarioNuevo = this.usuarioFacade.find(new Integer(id));
+                    usuarioNuevo = this.usuarioService.buscarUsuario(new Integer(id));
                     if(!strClave.equals(strClaveConf)){
                         strError = "Error de creación: las contraseñas son diferentes";
                         request.setAttribute("errorContra", strError);
@@ -106,12 +100,9 @@ public class ServletUsuarioGuardar extends HttpServlet {
                         RequestDispatcher rd = request.getRequestDispatcher("crearEditarUsuario.jsp");
                         rd.forward(request, response); 
                     }else{
-                        Usuario i = this.usuarioFacade.findByNick(strNick);
-                        if(i == null || i.equals(usuarioNuevo)){
-                            usuarioNuevo.setNickname(strNick);
-                            usuarioNuevo.setContrasena(strClave);
-                            usuarioNuevo.setTipoUsuario(tipoUsuario);
-                            this.usuarioFacade.edit(usuarioNuevo);  
+                        UsuarioDTO i = this.usuarioService.buscarUsuarioNick(strNick);
+                        if(i == null || i.getId().equals(usuarioNuevo.getId())){
+                            this.usuarioService.guardarUsuario(id, strNick, strClave, tipoUsuario);  
                             response.sendRedirect("ServletUsuarioListar"); 
                         }else{
                             strError = "Error de creación: este nick está cogido";

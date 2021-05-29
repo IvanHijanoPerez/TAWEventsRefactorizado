@@ -16,8 +16,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import tawevents.dao.UsuarioFacade;
-import tawevents.entity.Usuario;
+import tawevents.dto.UsuarioDTO;
+import tawevents.service.UsuarioService;
+
 
 /**
  *
@@ -27,7 +28,7 @@ import tawevents.entity.Usuario;
 public class ServletUsuarioCrearEditar extends HttpServlet {
 
     @EJB
-    private UsuarioFacade usuarioFacade;
+    private UsuarioService usuarioService;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -42,7 +43,7 @@ public class ServletUsuarioCrearEditar extends HttpServlet {
             throws ServletException, IOException {
         String strTo = "crearEditarUsuario.jsp";
         HttpSession session = request.getSession();
-        Usuario usuario = (Usuario)session.getAttribute("usuario");
+        UsuarioDTO usuario = (UsuarioDTO)session.getAttribute("usuario");
         if (usuario == null) {
             request.setAttribute("error", "Usuario no autenticado");
             strTo = "inicioSesion.jsp";
@@ -50,7 +51,7 @@ public class ServletUsuarioCrearEditar extends HttpServlet {
             String strId = request.getParameter("id");
 
             if (strId != null) { // Es editar usuario
-                Usuario us = this.usuarioFacade.find(new Integer(strId));
+                UsuarioDTO us = this.usuarioService.buscarUsuario(new Integer(strId));
                 if(us.getTipoUsuario().equals("usuariodeeventos")){
                     strTo = "editarUsuarioDeEventos.jsp";
                 }

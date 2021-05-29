@@ -75,8 +75,37 @@ public class UsuarioService {
         }
     }
     
+    public UsuarioDTO buscarUsuarioNick (String nick) {
+        Usuario usuario = this.usuarioFacade.findByNick(nick);
+        if (usuario != null) {
+            return usuario.getDTO();
+        } else {
+            return null;
+        }
+    }
+    
     public void borrarUsuario (Integer id) {
         Usuario usuario = this.usuarioFacade.find(id);
         this.usuarioFacade.remove(usuario);
+    }
+    
+    public void guardarUsuario (String id, String nickname,  String contrasena, 
+             String tipoUsuario) {
+        Usuario usuario; 
+
+        if (id == null || id.isEmpty()) { // Crear nuevo cliente
+            usuario = new Usuario();            
+        } else { // Editar cliente existente
+            usuario = this.usuarioFacade.find(new Integer(id));
+        }
+        usuario.setNickname(nickname);
+        usuario.setContrasena(contrasena);
+        usuario.setTipoUsuario(tipoUsuario);
+
+        if (id == null || id.isEmpty()) { // Crear nuevo cliente        
+            this.usuarioFacade.create(usuario);
+        } else { // Editar cliente existente
+            this.usuarioFacade.edit(usuario);
+        }        
     }
 }

@@ -4,7 +4,8 @@
     Author     : Ivan
 --%>
 
-<%@page import="tawevents.entity.Usuario"%>
+
+<%@page import="tawevents.dto.UsuarioDTO"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -20,14 +21,14 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
     </head>
     <%
-        Usuario usuario = (Usuario)session.getAttribute("usuario");
+        UsuarioDTO usuario = (UsuarioDTO)session.getAttribute("usuario");
         if (usuario == null) {
     %>        
     <jsp:forward page="inicioSesion.jsp" />
         
     <%
         }
-        Usuario usuarioEditar = (Usuario)request.getAttribute("usuarioEditar");
+        UsuarioDTO usuarioEditar = (UsuarioDTO)request.getAttribute("usuarioEditar");
         String strNick = "", strContrasena = "", strTipoUsuario = "", strId = "";
         String strError = (String)request.getAttribute("errorRegistro");
         String strErrorContra = (String)request.getAttribute("errorContra");

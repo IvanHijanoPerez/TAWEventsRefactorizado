@@ -6,6 +6,7 @@
 package tawevents.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -190,6 +191,13 @@ public class Usuario implements Serializable {
         dto.setTipoUsuario(tipoUsuario);
         if(usuarioDeEventos != null){
             dto.setUsuarioDeEventos(usuarioDeEventos.getId());
+        }
+        if(eventoList != null){
+            List<Integer> eventos = new ArrayList<Integer>();
+            for(Evento e: eventoList){
+            eventos.add(e.getId());
+        }
+        dto.setEventoList(eventos);
         }
         return dto;
     }
