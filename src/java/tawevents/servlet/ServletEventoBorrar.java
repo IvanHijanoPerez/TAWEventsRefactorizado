@@ -15,9 +15,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import tawevents.dao.EventoFacade;
-import tawevents.entity.Evento;
-import tawevents.entity.Usuario;
+import tawevents.dto.EventoDTO;
+import tawevents.dto.UsuarioDTO;
+import tawevents.service.EventoService;
 
 /**
  *
@@ -27,7 +27,7 @@ import tawevents.entity.Usuario;
 public class ServletEventoBorrar extends HttpServlet {
 
     @EJB
-    private EventoFacade eventoFacade;
+    private EventoService eventoService;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -41,7 +41,7 @@ public class ServletEventoBorrar extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Usuario usuario = (Usuario)session.getAttribute("usuario");
+        UsuarioDTO usuario = (UsuarioDTO)session.getAttribute("usuario");
         if (usuario == null) {
             request.setAttribute("errorRegistro", "Usuario no autenticado");
             RequestDispatcher rd = request.getRequestDispatcher("inicioSesion.jsp");
@@ -49,8 +49,8 @@ public class ServletEventoBorrar extends HttpServlet {
         } else {                
             String strId = request.getParameter("idE");
 
-            Evento elEvento = this.eventoFacade.find(new Integer(strId));
-            this.eventoFacade.remove(elEvento);
+            EventoDTO elEvento = this.eventoService.buscarEvento(new Integer(strId));
+            this.eventoService.borrarEvento(elEvento);
             
             
             response.sendRedirect("ServletEventoListar"); 

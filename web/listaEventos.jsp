@@ -4,9 +4,9 @@
     Author     : Ivan
 --%>
 
+<%@page import="tawevents.dto.EventoDTO"%>
+<%@page import="tawevents.dto.UsuarioDTO"%>
 <%@page import="java.text.SimpleDateFormat"%>
-<%@page import="tawevents.entity.Evento"%>
-<%@page import="tawevents.entity.Usuario"%>
 <%@page import="java.util.List"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -23,15 +23,15 @@
         <title>Eventos</title>
     </head>
     <%
-        Usuario usuario = (Usuario)session.getAttribute("usuario");
+        UsuarioDTO usuario = (UsuarioDTO)session.getAttribute("usuario");
         if (usuario == null) {
     %>        
     <jsp:forward page="inicioSesion.jsp" />
         
     <%
         }
-        List<Evento> lista = (List)request.getAttribute("listaEv");
-        List<Usuario> listaUs = (List)request.getAttribute("listaUs");
+        List<EventoDTO> lista = (List)request.getAttribute("listaEv");
+        List<UsuarioDTO> listaUs = (List)request.getAttribute("listaUs");
         SimpleDateFormat fechaSimple = new SimpleDateFormat("dd/MM/yyyy");
     %>
     <body onload="myFunction()">
@@ -91,7 +91,7 @@
                         </thead>
                         <tbody>
                             <%
-                                for (Evento ev:lista) {
+                                for (EventoDTO ev:lista) {
                             %>   
                             <tr>
                                 <td><%= ev.getTitulo() %></td>
@@ -99,8 +99,8 @@
                                 <td><%= ev.getAforoMax() %></td>
                                 <%
                                     String nombre = "";
-                                    for(Usuario u:listaUs){
-                                        if (u.getId().equals(ev.getUsuario().getId())){
+                                    for(UsuarioDTO u:listaUs){
+                                        if (u.getId().equals(ev.getUsuario())){
                                             nombre = u.getNickname();
                                         }
                                     }

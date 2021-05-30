@@ -22,11 +22,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import tawevents.dao.EtiquetaFacade;
-import tawevents.dao.EventoFacade;
-import tawevents.entity.Etiqueta;
-import tawevents.entity.Evento;
-import tawevents.entity.Usuario;
+import tawevents.dto.EtiquetaDTO;
+import tawevents.dto.EventoDTO;
+import tawevents.dto.UsuarioDTO;
+import tawevents.service.EtiquetaService;
+import tawevents.service.EventoService;
 
 /**
  *
@@ -36,10 +36,10 @@ import tawevents.entity.Usuario;
 public class ServletEventoGuardarAdmin extends HttpServlet {
 
     @EJB
-    private EtiquetaFacade etiquetaFacade;
+    private EtiquetaService etiquetaService;
 
     @EJB
-    private EventoFacade eventoFacade;
+    private EventoService eventoService;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -53,7 +53,7 @@ public class ServletEventoGuardarAdmin extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Usuario usuario = (Usuario)session.getAttribute("usuario");
+        UsuarioDTO usuario = (UsuarioDTO)session.getAttribute("usuario");
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         String eventoId = request.getParameter("id");
         String titulo = request.getParameter("titulo");
@@ -90,94 +90,30 @@ public class ServletEventoGuardarAdmin extends HttpServlet {
         String asientos_por_fila = request.getParameter("asientos_por_fila");
         
         if(eventoId != null){
-            Evento eventoEditar = eventoFacade.find(new Integer(eventoId));
+            EventoDTO eventoEditar = eventoService.buscarEvento(new Integer(eventoId));
             if(fecha.before(fecha_limite_entradas)){
                 request.setAttribute("eventoEditar", eventoEditar);
+                String etiquetass = this.eventoService.getEtiquetasToString(eventoEditar);
+                request.setAttribute("etiquetas", etiquetass);
                 request.setAttribute("errorRegistro", "Error de edición: fechas no válidas");
                 RequestDispatcher rd = request.getRequestDispatcher("editarEventoAdmin.jsp");
                  rd.forward(request, response);
             }else{
+                eventoService.editarEvento(Integer.parseInt(eventoId), usuario.getId(), titulo, descripcion, etiquetas, Integer.parseInt(precio), imagen, fecha, fecha_limite_entradas, Integer.parseInt(aforo_maximo), Integer.parseInt(maximo_entradas_usuario), asientos_asignados, numero_filas, asientos_por_fila);                
                 
-                eventoEditar.setTitulo(titulo);
-                eventoEditar.setDescripcion(descripcion);
-                eventoEditar.setPrecioEntrada(Integer.parseInt(precio)); 
-                eventoEditar.setImagen(imagen);
-                eventoEditar.setFecha(fecha);
-                eventoEditar.setFechaLimEntradas(fecha_limite_entradas);
-                eventoEditar.setAforoMax(Integer.parseInt(aforo_maximo));
-                eventoEditar.setMaxEntradasPorUsuario(Integer.parseInt(maximo_entradas_usuario));   
-                if("Si".equals(asientos_asignados)){
-                    eventoEditar.setAsientosAsignados(true);
-                    eventoEditar.setNumFilas(Integer.parseInt(numero_filas));
-                    eventoEditar.setAsientosPorFila(Integer.parseInt(asientos_por_fila)); 
-                }else{
-                    eventoEditar.setAsientosAsignados(false);
-                    eventoEditar.setNumFilas(null);
-                    eventoEditar.setAsientosPorFila(null); 
-                 }
-                List<Etiqueta> etiquetaList = new ArrayList(); 
-                String[] arrayEtiquetas = etiquetas.split(" ");
-                for(String item : arrayEtiquetas){
-                    Etiqueta buscada = etiquetaFacade.findBySimilarNombreI(item);
-                    if(buscada==null){
-                           Etiqueta e = new Etiqueta();
-                          e.setNombre(item);
-                         etiquetaList.add(e);
-                        etiquetaFacade.create(e);  
-                    }else{
-                        etiquetaList.add(buscada);
-                    }
-                }
-                eventoEditar.setEtiquetaList(etiquetaList);
-                eventoFacade.edit(eventoEditar);
                 RequestDispatcher rd = request.getRequestDispatcher("ServletEventoListar");
                 rd.forward(request, response);
                 //response.sendRedirect("ServletEventoListar");   
             }
                       
         }else{
-            System.out.println(format.format(fecha));
-            System.out.println(format.format(fecha_limite_entradas));
+            
             if(fecha.before(fecha_limite_entradas)){
                 request.setAttribute("errorRegistro", "Error de creación: fechas no válidas");
                 RequestDispatcher rd = request.getRequestDispatcher("crearEventoAdmin.jsp");
                 rd.forward(request, response);
             }else{
-                Evento eventoEditar = new Evento();
-                eventoEditar.setUsuario(usuario);
-                eventoEditar.setTitulo(titulo);
-                eventoEditar.setDescripcion(descripcion);
-                eventoEditar.setPrecioEntrada(Integer.parseInt(precio)); 
-                eventoEditar.setImagen(imagen);
-                eventoEditar.setFecha(fecha);
-                eventoEditar.setFechaLimEntradas(fecha_limite_entradas);
-                eventoEditar.setAforoMax(Integer.parseInt(aforo_maximo));
-                eventoEditar.setMaxEntradasPorUsuario(Integer.parseInt(maximo_entradas_usuario));   
-                if("Si".equals(asientos_asignados)){
-                    eventoEditar.setAsientosAsignados(true);
-                    eventoEditar.setNumFilas(Integer.parseInt(numero_filas));
-                    eventoEditar.setAsientosPorFila(Integer.parseInt(asientos_por_fila)); 
-                }else{
-                    eventoEditar.setAsientosAsignados(false);
-                    eventoEditar.setNumFilas(null);
-                    eventoEditar.setAsientosPorFila(null); 
-                 }
-                List<Etiqueta> etiquetaList = new ArrayList(); 
-                String[] arrayEtiquetas = etiquetas.split(" ");
-                for(String item : arrayEtiquetas){
-                    Etiqueta buscada = etiquetaFacade.findBySimilarNombreI(item);
-                    if(buscada==null){
-                        Etiqueta e = new Etiqueta();
-                        e.setNombre(item);
-                        etiquetaList.add(e);
-                        etiquetaFacade.create(e);  
-                    }else{
-                        etiquetaList.add(buscada);
-                    }
-                }
-                eventoEditar.setEtiquetaList(etiquetaList);
-
-                eventoFacade.create(eventoEditar);
+                eventoService.crearEvento(usuario.getId(), titulo, descripcion, etiquetas, Integer.parseInt(precio), imagen, fecha, fecha_limite_entradas, Integer.parseInt(aforo_maximo), Integer.parseInt(maximo_entradas_usuario), asientos_asignados, numero_filas, asientos_por_fila);
                 RequestDispatcher rd = request.getRequestDispatcher("ServletEventoListar");
                 rd.forward(request, response);
                 //response.sendRedirect("ServletEventoListar");

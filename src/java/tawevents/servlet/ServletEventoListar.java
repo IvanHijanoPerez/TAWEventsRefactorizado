@@ -21,12 +21,12 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import tawevents.dao.EtiquetaFacade;
-import tawevents.dao.EventoFacade;
-import tawevents.dao.UsuarioFacade;
-import tawevents.entity.Etiqueta;
-import tawevents.entity.Evento;
-import tawevents.entity.Usuario;
+import tawevents.dto.EtiquetaDTO;
+import tawevents.dto.EventoDTO;
+import tawevents.dto.UsuarioDTO;
+import tawevents.service.EtiquetaService;
+import tawevents.service.EventoService;
+import tawevents.service.UsuarioService;
 
 /**
  *
@@ -36,13 +36,13 @@ import tawevents.entity.Usuario;
 public class ServletEventoListar extends HttpServlet {
 
     @EJB
-    private EtiquetaFacade etiquetaFacade;
+    private EtiquetaService etiquetaService;
 
     @EJB
-    private UsuarioFacade usuarioFacade;
+    private EventoService eventoService;
 
     @EJB
-    private EventoFacade eventoFacade;
+    private UsuarioService usuarioService;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -55,8 +55,8 @@ public class ServletEventoListar extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        List<Evento> lista;
-        List<Usuario> l = this.usuarioFacade.findAll();
+        List<EventoDTO> lista;
+        List<UsuarioDTO> l = this.usuarioService.TodosUsuarios();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         String tipoFiltro = request.getParameter("tipoFiltro");
         String filtroT = request.getParameter("filtroT");
@@ -68,9 +68,9 @@ public class ServletEventoListar extends HttpServlet {
         String filtroC = request.getParameter("filtroC");
         if ((filtroT != null && filtroT.length()>0 ) || (filtroN != null && filtroN.length()>0 ) || (filtroF != null && filtroF.length()>0 ) || (filtroC != null && filtroC.length()>0 )) {
             if(tipoFiltro.equals("fNombre")){
-                lista = this.eventoFacade.findBySimilarNombre(filtroT);
+                lista = this.eventoService.filtroNombre(filtroT);
             }else if(tipoFiltro.equals("fDescripcion")){
-                lista = this.eventoFacade.findBySimilarDescripcion(filtroT);
+                lista = this.eventoService.filtroDescripcion(filtroT);
             }else if(tipoFiltro.equals("fFecha")){
                 Date fecha = null;
                 try {
@@ -78,7 +78,7 @@ public class ServletEventoListar extends HttpServlet {
                 } catch (ParseException ex) {
                     Logger.getLogger(ServletEventoGuardar.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                lista = this.eventoFacade.findBySimilarFecha(fecha);
+                lista = this.eventoService.filtroFecha(fecha);
             }else if(tipoFiltro.equals("fFechaEntrada")){
                 Date fecha = null;
                 try {
@@ -86,35 +86,35 @@ public class ServletEventoListar extends HttpServlet {
                 } catch (ParseException ex) {
                     Logger.getLogger(ServletEventoGuardar.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                lista = this.eventoFacade.findBySimilarFechaEntrada(fecha);
+                lista = this.eventoService.filtroFechaEntrada(fecha);
             }else if(tipoFiltro.equals("fPrecio")){
-                lista = this.eventoFacade.findBySimilarPrecio(filtroN);
+                lista = this.eventoService.filtroPrecio(filtroN);
             }else if(tipoFiltro.equals("fAforo")){
-                lista = this.eventoFacade.findBySimilarAforo(filtroN);
+                lista = this.eventoService.filtroAforo(filtroN);
             }else if(tipoFiltro.equals("fMaxEntradasUsuario")){
-                lista = this.eventoFacade.findBySimilarMaxEntradasUsuario(filtroN);
+                lista = this.eventoService.filtroMaxEntradasUsuario(filtroN);
             }else if(tipoFiltro.equals("fAsientosAsignados")){
-                lista = this.eventoFacade.findBySimilarAsientosAsignados(filtroC);
+                lista = this.eventoService.filtroAsientosAsignados(filtroC);
             }else if(tipoFiltro.equals("fNumFilas")){
-                lista = this.eventoFacade.findBySimilarNumFilas(filtroN);
+                lista = this.eventoService.filtroNumFilas(filtroN);
             }else if(tipoFiltro.equals("fAsientosFila")){
-                lista = this.eventoFacade.findBySimilarAsientosFila(filtroN);
+                lista = this.eventoService.filtroAsientosFila(filtroN);
             }else if(tipoFiltro.equals("fCreador")){
-                lista = this.eventoFacade.findBySimilarCreador(filtroT);
+                lista = this.eventoService.filtroCreador(filtroT);
             }else if(tipoFiltro.equals("fEtiqueta")){
-                Etiqueta e = etiquetaFacade.findBySimilarNombreI(filtroT);
+                EtiquetaDTO e = this.etiquetaService.filtroNombre(filtroT);
                 
                 if(e == null){
                     lista = new ArrayList();
                 }else{
-                   lista = e.getEventoList();
+                   lista = this.eventoService.convertirAListaDTOdirectamente(e.getEventoList());
                 }       
             }else{
-                lista = this.eventoFacade.findBySimilarImagen(filtroT);
+                lista = this.eventoService.filtroImagen(filtroT);
             }
             
         }else{
-            lista = this.eventoFacade.findAll();
+            lista = this.eventoService.TodosEventos();
         }
         
         request.setAttribute("listaEv", lista);

@@ -15,9 +15,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import tawevents.dao.EventoFacade;
-import tawevents.entity.Evento;
-import tawevents.entity.Usuario;
+import tawevents.dto.EventoDTO;
+import tawevents.dto.UsuarioDTO;
+import tawevents.service.EventoService;
 
 /**
  *
@@ -27,7 +27,7 @@ import tawevents.entity.Usuario;
 public class ServletEventoEditarAdmin extends HttpServlet {
 
     @EJB
-    private EventoFacade eventoFacade;
+    private EventoService eventoService;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -42,7 +42,7 @@ public class ServletEventoEditarAdmin extends HttpServlet {
             throws ServletException, IOException {
         String strTo = "editarEventoAdmin.jsp";
         HttpSession session = request.getSession();
-        Usuario usuario = (Usuario)session.getAttribute("usuario");
+        UsuarioDTO usuario = (UsuarioDTO)session.getAttribute("usuario");
         if (usuario == null) {
             request.setAttribute("error", "Usuario no autenticado");
             strTo = "inicioSesion.jsp";
@@ -50,8 +50,10 @@ public class ServletEventoEditarAdmin extends HttpServlet {
             String strId = request.getParameter("idE");
 
             if (strId != null) { // Es editar usuario
-                Evento us = this.eventoFacade.find(new Integer(strId));
-                request.setAttribute("eventoEditar", us);            
+                EventoDTO us = this.eventoService.buscarEvento(new Integer(strId));
+                request.setAttribute("eventoEditar", us);
+                String etiquetas = this.eventoService.getEtiquetasToString(us);
+                request.setAttribute("etiquetas", etiquetas);
             }        
 
         }

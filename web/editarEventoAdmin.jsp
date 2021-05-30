@@ -4,9 +4,9 @@
     Author     : Ivan
 --%>
 
+<%@page import="tawevents.dto.EventoDTO"%>
+<%@page import="tawevents.dto.UsuarioDTO"%>
 <%@page import="java.text.SimpleDateFormat"%>
-<%@page import="tawevents.entity.Evento"%>
-<%@page import="tawevents.entity.Usuario"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -22,14 +22,15 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
     </head>
     <%
-        Usuario usuario = (Usuario)session.getAttribute("usuario");
+        UsuarioDTO usuario = (UsuarioDTO)session.getAttribute("usuario");
         if (usuario == null) {
     %>        
     <jsp:forward page="inicioSesion.jsp" />
         
     <%
         }
-        Evento eventoEditar = (Evento)request.getAttribute("eventoEditar");
+        EventoDTO eventoEditar = (EventoDTO)request.getAttribute("eventoEditar");
+        String etiquetas = (String)request.getAttribute("etiquetas");
         String strError = (String)request.getAttribute("errorRegistro");
           
             String strId = eventoEditar.getId().toString();
@@ -42,7 +43,7 @@
             String strMaxEntradas = String.valueOf(eventoEditar.getMaxEntradasPorUsuario());
             boolean strAsientosAsignados = eventoEditar.getAsientosAsignados();
             String strImagen = eventoEditar.getImagen();
-            String strEtiquetas = eventoEditar.getEtiquetasToString1();
+            String strEtiquetas = etiquetas;
             String strNumFilas = "";
             if(eventoEditar.getNumFilas() != null){
                 strNumFilas = eventoEditar.getNumFilas().toString();

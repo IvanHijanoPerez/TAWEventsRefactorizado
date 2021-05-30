@@ -70,4 +70,25 @@ public class EtiquetaService {
      public void edit(EtiquetaDTO e){
          etiquetaFacade.edit(etiquetaFacade.find(e.getId()));
      }
+     
+     public EtiquetaDTO filtroNombre(String nombre){
+        Etiqueta etiqueta = etiquetaFacade.findBySimilarNombreI(nombre);
+        return etiqueta.getDTO();
+    }
+     
+     public EtiquetaDTO buscarEtiqueta (Integer id) {
+        Etiqueta etiqueta = this.etiquetaFacade.find(id);
+        if (etiqueta != null) {
+            return etiqueta.getDTO();
+        } else {
+            return null;
+        }
+    }
+     
+     public int crearEtiqueta (String nombre) {
+        Etiqueta etiqueta = new Etiqueta();            
+        etiqueta.setNombre(nombre);      
+        this.etiquetaFacade.create(etiqueta);   
+        return etiqueta.getId();
+    }
 }
