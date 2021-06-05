@@ -18,6 +18,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
+import tawevents.dto.PublicoDTO;
 
 /**
  *
@@ -120,6 +121,17 @@ public class Publico implements Serializable {
     @Override
     public String toString() {
         return "tawevents.entity.Publico[ id=" + id + " ]";
+    }
+    
+    public PublicoDTO getDTO() {
+        PublicoDTO dto = new PublicoDTO();
+        dto.setId(id);
+        dto.setFila(fila);
+        dto.setAsiento(asiento);
+        dto.setEvento(evento.getId());
+        dto.setUsuarioDeEventos(usuarioDeEventos.getId());
+        
+        return dto;
     }
     
 }

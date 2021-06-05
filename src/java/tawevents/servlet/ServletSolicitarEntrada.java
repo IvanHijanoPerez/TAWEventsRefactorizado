@@ -22,6 +22,7 @@ import tawevents.entity.Evento;
 import tawevents.entity.Publico;
 import tawevents.entity.Usuario;
 import tawevents.entity.UsuarioDeEventos;
+import tawevents.service.PublicoService;
 
 /**
  *
@@ -31,7 +32,7 @@ import tawevents.entity.UsuarioDeEventos;
 public class ServletSolicitarEntrada extends HttpServlet {
 
     @EJB
-    PublicoFacade publicoFacade;
+    PublicoService publicoService;
 
     @EJB
     EventoFacade eventoFacade;
@@ -56,28 +57,23 @@ public class ServletSolicitarEntrada extends HttpServlet {
         UsuarioDeEventos usuarioDeEventos = ((Usuario) session.getAttribute("usuario")).getUsuarioDeEventos();
         Publico publico = new Publico();
 
-        publico.setEvento(evento);
-        publico.setUsuarioDeEventos(usuarioDeEventos);
-
         if (evento.getAsientosAsignados()) {
-            //TODO: Controlar que se han introducido numeros y que el asiento no este asignado
-            int fila = new Integer(request.getParameter("fila")) - 1;
-            int asiento = new Integer(request.getParameter("asiento")) - 1;
-            publico.setFila(fila);
-            publico.setAsiento(asiento);
+            publicoService.createAsientosAsignados(publico, evento, usuarioDeEventos, new Integer(request.getParameter("fila")) - 1, new Integer(request.getParameter("asiento")) - 1);
+
+        } else {
+            publicoService.createSinAsientos(publico, evento, usuarioDeEventos);
         }
 
-        publicoFacade.create(publico);
-
-        List<Publico> listaPublico = evento.getPublicoList();
-        listaPublico.add(publico);
-        evento.setPublicoList(listaPublico);
-        eventoFacade.edit(evento);
-
-        List<Publico> listaAsistencias = usuarioDeEventos.getPublicoList();
-        listaAsistencias.add(publico);
-        usuarioDeEventos.setPublicoList(listaAsistencias);
-        usuarioDeEventosFacade.edit(usuarioDeEventos);
+        
+//        List<Publico> listaPublico = evento.getPublicoList();
+//        listaPublico.add(publico);
+//        evento.setPublicoList(listaPublico);
+//        eventoFacade.edit(evento);
+//
+//        List<Publico> listaAsistencias = usuarioDeEventos.getPublicoList();
+//        listaAsistencias.add(publico);
+//        usuarioDeEventos.setPublicoList(listaAsistencias);
+//        usuarioDeEventosFacade.edit(usuarioDeEventos);
 
         response.sendRedirect("ServletUnirseEvento?id_evento=" + evento.getId());
     }

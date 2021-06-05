@@ -35,6 +35,15 @@ public class UsuarioService {
         }
     }
     
+    public Usuario comprobarCredencialesUsuario(String strNick, String strClave){
+        Usuario usuario = usuarioFacade.findByNickAndPassword(strNick, strClave);
+        if(usuario != null){
+            return usuario;
+        }else{
+            return null;
+        }
+    }
+    
     protected List<UsuarioDTO> convertirAListaDTO (List<Usuario> lista) {
         if (lista != null) {
             List<UsuarioDTO> listaDTO = new ArrayList<UsuarioDTO>();

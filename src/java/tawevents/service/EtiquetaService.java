@@ -56,8 +56,12 @@ public class EtiquetaService {
         
      }
      
-     
-     
+     public Etiqueta findByNombreExacto(String nombre) {
+         return etiquetaFacade.findByNombreExacto(nombre);
+     }
+             
+             
+             
      public EtiquetaDTO findBySimilarNombre(String nombre){
          EtiquetaDTO et = etiquetaFacade.findBySimilarNombre(nombre).getDTO();
          return et;

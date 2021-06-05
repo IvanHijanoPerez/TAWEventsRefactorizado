@@ -18,10 +18,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import tawevents.dao.EventoFacade;
 import tawevents.dao.PublicoFacade;
+import tawevents.dto.PublicoDTO;
 import tawevents.entity.Evento;
 import tawevents.entity.Publico;
 import tawevents.entity.Usuario;
 import tawevents.entity.UsuarioDeEventos;
+import tawevents.service.PublicoService;
 
 /**
  *
@@ -34,7 +36,7 @@ public class ServletUnirseEvento extends HttpServlet {
     private EventoFacade eventoFacade;
     
     @EJB
-    private PublicoFacade publicoFacade;
+    private PublicoService publicoService;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -52,7 +54,7 @@ public class ServletUnirseEvento extends HttpServlet {
         
         Evento evento = eventoFacade.findById(new Integer(request.getParameter("id_evento")));
         request.setAttribute("evento", evento);
-        List<Publico> publicos = publicoFacade.findByUsuarioYEvento(((Usuario)session.getAttribute("usuario")).getUsuarioDeEventos(), evento);
+        List<Publico> publicos = publicoService.findByUsuarioYEvento(((Usuario)session.getAttribute("usuario")).getUsuarioDeEventos(), evento);
         request.setAttribute("publicos", publicos);
         
         boolean [][] ocupados = null;

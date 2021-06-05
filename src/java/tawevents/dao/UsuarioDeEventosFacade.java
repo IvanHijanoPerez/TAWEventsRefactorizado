@@ -41,4 +41,15 @@ public class UsuarioDeEventosFacade extends AbstractFacade<UsuarioDeEventos> {
 
         return lista == null || lista.isEmpty();
     }
+    
+    public UsuarioDeEventos findById(Integer id) {
+        Query q;
+        List<UsuarioDeEventos> lista;
+
+        q = this.em.createQuery("SELECT u FROM UsuarioDeEventos u WHERE u.id = :id");
+        q.setParameter("id", id);
+        lista = q.getResultList();
+        
+        return lista.get(0);
+    }
 }

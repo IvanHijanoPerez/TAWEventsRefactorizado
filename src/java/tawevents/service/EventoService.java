@@ -157,6 +157,18 @@ public class EventoService {
         return convertirAListaDTO(eventos);
     }
      
+    public List<Evento> findByDisponiblesEtiqueta(Etiqueta e) {
+        return eventoFacade.findByDisponiblesEtiqueta(e);
+    }
+    
+    public List<Evento> findByDisponiblesMasPopulares() {
+        return eventoFacade.findByDisponiblesMasPopulares();
+    }
+    
+    public List<Evento> findByDisponiblesMasCercanos() {
+        return eventoFacade.findByDisponiblesMasCercanos();
+    }
+     
      public EventoDTO buscarEvento (Integer id) {
         Evento evento = this.eventoFacade.find(id);
         if (evento != null) {

@@ -6,6 +6,7 @@
 package tawevents.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Basic;
@@ -25,6 +26,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import tawevents.dto.UsuarioDeEventosDTO;
 
 /**
  *
@@ -182,6 +184,35 @@ public class UsuarioDeEventos implements Serializable {
     @Override
     public String toString() {
         return "tawevents.entity.UsuarioDeEventos[ id=" + id + " ]";
+    }
+    
+    public UsuarioDeEventosDTO getDTO() {
+        UsuarioDeEventosDTO dto = new UsuarioDeEventosDTO();
+        dto.setId(id);
+        dto.setNombre(nombre);
+        dto.setApellidos(apellidos);
+        dto.setCorreo(correo);
+        dto.setCiudad(ciudad);
+        dto.setFechaNacimiento(fechaNacimiento);
+        dto.setSexo(sexo);
+                
+        if(publicoList != null){
+            List<Integer> publicos = new ArrayList<>();
+            for(Publico p : publicoList) {
+                publicos.add(p.getId());
+            }
+            dto.setPublicoList(publicos);
+        }
+        
+        if(usuarioList != null){
+            List<Integer> usuarios = new ArrayList<>();
+            for(Usuario u : usuarioList) {
+                usuarios.add(u.getId());
+            }
+            dto.setUsuarioList(usuarios);
+        }
+        
+        return dto;
     }
     
 }
