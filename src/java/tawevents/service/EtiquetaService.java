@@ -9,9 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import tawevents.dao.EventoFacade;
-import tawevents.dto.EventoDTO;
-import tawevents.entity.Evento;
 import tawevents.dao.EtiquetaFacade;
 import tawevents.dto.EtiquetaDTO;
 import tawevents.entity.Etiqueta;
@@ -56,16 +53,14 @@ public class EtiquetaService {
         
      }
      
-
-     
-     
      public EtiquetaDTO findByNombreExacto(String nombre) {
-         return etiquetaFacade.findByNombreExacto(nombre).getDTO();
+         Etiqueta e = etiquetaFacade.findByNombreExacto(nombre);
+         return (e == null) ? null : e.getDTO();
      }  
              
      public EtiquetaDTO findBySimilarNombre(String nombre){
-         EtiquetaDTO et = etiquetaFacade.findBySimilarNombre(nombre).getDTO();
-         return et;
+         Etiqueta et = etiquetaFacade.findBySimilarNombre(nombre);
+         return (et == null) ? null : et.getDTO();
      }
      
      public void remove(EtiquetaDTO e){

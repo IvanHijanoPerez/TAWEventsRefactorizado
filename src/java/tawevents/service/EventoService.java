@@ -19,12 +19,10 @@ import tawevents.dao.UsuarioFacade;
 import tawevents.dto.EtiquetaDTO;
 import tawevents.dto.EventoDTO;
 import tawevents.dto.PublicoDTO;
-import tawevents.dto.UsuarioDTO;
 import tawevents.dto.UsuarioDeEventosDTO;
 import tawevents.entity.Etiqueta;
 import tawevents.entity.Evento;
 import tawevents.entity.Publico;
-import tawevents.entity.Usuario;
 import tawevents.entity.UsuarioDeEventos;
 
 /**
@@ -114,7 +112,7 @@ public class EventoService {
      
      public List<EventoDTO> findByEtiquetaHistorial(EtiquetaDTO e, UsuarioDeEventosDTO usuarioDeEventos){
          UsuarioDeEventos user = usuarioDeEventosFacade.findById(usuarioDeEventos.getId());
-         Etiqueta et = etiquetaFacade.find(e.getId());
+         Etiqueta et = etiquetaFacade.findById(e.getId());
          return convertirAListaDTO(eventoFacade.findByEtiquetaHistorial(et, user));
      }
      
@@ -130,7 +128,7 @@ public class EventoService {
      
      public List<EventoDTO> findByEtiquetaReserva(EtiquetaDTO e, UsuarioDeEventosDTO usuarioDeEventos){
          UsuarioDeEventos user = usuarioDeEventosFacade.findById(usuarioDeEventos.getId());
-         Etiqueta et = etiquetaFacade.find(e.getId());
+         Etiqueta et = etiquetaFacade.findById(e.getId());
          return convertirAListaDTO(eventoFacade.findByEtiquetaReserva(et, user));
      }
      
@@ -209,7 +207,7 @@ public class EventoService {
     }
      
     public List<EventoDTO> findByDisponiblesEtiqueta(EtiquetaDTO e) {
-        Etiqueta et = etiquetaFacade.find(e.getId());
+        Etiqueta et = etiquetaFacade.findById(e.getId());
         return convertirAListaDTO(eventoFacade.findByDisponiblesEtiqueta(et));
     }
     

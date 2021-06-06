@@ -32,6 +32,14 @@ public class EtiquetaFacade extends AbstractFacade<Etiqueta> {
         super(Etiqueta.class);
     }
     
+    public Etiqueta findById(Integer id) {
+        Query q;
+        
+        q = em.createNamedQuery("Etiqueta.findById");
+        q.setParameter("id", id);
+        return (q.getResultList().isEmpty()) ? null : (Etiqueta)q.getResultList().get(0);
+    }
+    
     public Etiqueta findByNombre(String filtro) {
         Query q;
         

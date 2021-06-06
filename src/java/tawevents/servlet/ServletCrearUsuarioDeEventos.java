@@ -21,8 +21,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import tawevents.dto.UsuarioDTO;
-import tawevents.dto.UsuarioDeEventosDTO;
 import tawevents.service.UsuarioDeEventosService;
 import tawevents.service.UsuarioService;
 
@@ -59,7 +57,6 @@ public class ServletCrearUsuarioDeEventos extends HttpServlet {
         String strErrorNick = "", strErrorCorreo = "", strErrorFormato = "", strErrorConfirmar = "", strErrorNacimiento = "";
         String nick, correoElectronico, contrasena, confirmarContrasena, nombre, apellidos, ciudad, sexo;
         Date fechaNacimiento = null;
-        UsuarioDeEventosDTO usuarioEventos;
         
         // ----------------------
         
@@ -118,20 +115,10 @@ public class ServletCrearUsuarioDeEventos extends HttpServlet {
             rd.forward(request, response);
             
         } else { // Si no hay errores
+                        
+            usuarioService.guardarUsuario(null, nick, contrasena, "usuariodeeventos", nombre, apellidos, correoElectronico, ciudad, sexo, fechaNacimiento);
             
-            usuarioEventos = new UsuarioDeEventosDTO();
-            usuarioEventos.setNombre(nombre);
-            usuarioEventos.setApellidos(apellidos);
-            usuarioEventos.setCorreo(correoElectronico);
-            usuarioEventos.setCiudad(ciudad);
-            usuarioEventos.setSexo(sexo);
-            usuarioEventos.setFechaNacimiento(fechaNacimiento);
-            
-            UsuarioDTO usuario = usuarioService.guardarUsuario(null, nick, contrasena, "usuariodeeventos", usuarioEventos);
-            
-            session.setAttribute("usuario", usuario);
-            
-            response.sendRedirect("ServletHomeUsuarioDeEventos");
+            response.sendRedirect("inicioSesion.jsp");
         }
 
     }
