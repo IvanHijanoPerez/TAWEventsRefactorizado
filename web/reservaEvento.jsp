@@ -4,6 +4,9 @@
     Author     : David
 --%>
 
+<%@page import="tawevents.dto.PublicoDTO"%>
+<%@page import="tawevents.dto.EventoDTO"%>
+<%@page import="tawevents.dto.UsuarioDTO"%>
 <%@page import="tawevents.entity.Publico"%>
 <%@page import="java.util.Date"%>
 <%@page import="java.text.SimpleDateFormat"%>
@@ -41,15 +44,16 @@
     </head>
 
     <%
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        UsuarioDTO usuario = (UsuarioDTO) session.getAttribute("usuario");
         if (usuario == null) {
     %>        
     <jsp:forward page="inicioSesion.jsp" />
 
     <%
         }
-        Evento evento = (Evento) request.getAttribute("evento");
-        List<Publico> publicoDeUsuario = (List) request.getAttribute("publicos");
+        EventoDTO evento = (EventoDTO) request.getAttribute("evento");
+        List<PublicoDTO> publicoDeUsuario = (List) request.getAttribute("publicosUs");
+        List<PublicoDTO> publicoDeEvento = (List) request.getAttribute("publicosEv");
         boolean[][] ocupados = (boolean[][]) request.getAttribute("ocupados");
         SimpleDateFormat formatterVista = new SimpleDateFormat("dd/MM/yyyy");
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
@@ -86,8 +90,8 @@
                     <input type="hidden" name="id_evento" value="<%=evento.getId()%>">
                     <%
                         int numeroEntradasReservadasPorUsuario = 0;
-                        for (Publico publico : evento.getPublicoList()) {
-                            if (publico.getUsuarioDeEventos().equals(usuario.getUsuarioDeEventos())) {
+                        for (PublicoDTO publico : publicoDeEvento) {
+                            if (publico.getUsuarioDeEventos() == usuario.getUsuarioDeEventos()) {
                                 numeroEntradasReservadasPorUsuario++;
                             }
                         }
@@ -125,8 +129,8 @@
                     </tr>
                     <%
                         int num = 1;
-                        for (Publico pub : publicoDeUsuario) {
-                            if (usuario.getUsuarioDeEventos().getPublicoList().contains(pub)) {
+                        for (PublicoDTO pub : publicoDeEvento) {
+                            if (publicoDeUsuario.contains(pub)) {
                     %>
                     <tr>
                         <td><%=num%></td>

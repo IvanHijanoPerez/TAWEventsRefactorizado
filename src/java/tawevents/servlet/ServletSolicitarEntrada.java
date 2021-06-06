@@ -15,16 +15,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import tawevents.dao.EventoFacade;
-import tawevents.dao.PublicoFacade;
-import tawevents.dao.UsuarioDeEventosFacade;
-import tawevents.entity.Evento;
-import tawevents.entity.Publico;
-import tawevents.entity.Usuario;
-import tawevents.entity.UsuarioDeEventos;
+import tawevents.dto.EventoDTO;
+import tawevents.dto.UsuarioDTO;
+import tawevents.dto.UsuarioDeEventosDTO;
 import tawevents.service.EventoService;
 import tawevents.service.PublicoService;
 import tawevents.service.UsuarioDeEventosService;
+import tawevents.service.UsuarioService;
 
 /**
  *
@@ -41,6 +38,9 @@ public class ServletSolicitarEntrada extends HttpServlet {
 
     @EJB
     UsuarioDeEventosService usuarioDeEventosService;
+    
+    @EJB
+    UsuarioService usuarioService;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -55,19 +55,15 @@ public class ServletSolicitarEntrada extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
-        Evento evento = eventoService.findById(new Integer(request.getParameter("id_evento")));
-        UsuarioDeEventos usuarioDeEventos = ((Usuario) session.getAttribute("usuario")).getUsuarioDeEventos();
-        Publico publico = new Publico();
+        EventoDTO evento = eventoService.find(new Integer(request.getParameter("id_evento")));
+        UsuarioDeEventosDTO usuarioDeEventos = usuarioService.getUsuarioDeEventos((UsuarioDTO)session.getAttribute("usuario"));
 
         if (evento.getAsientosAsignados()) {
-            publicoService.createAsientosAsignados(publico, evento, usuarioDeEventos, new Integer(request.getParameter("fila")) - 1, new Integer(request.getParameter("asiento")) - 1);
+            publicoService.createAsientosAsignados(evento, usuarioDeEventos, new Integer(request.getParameter("fila")) - 1, new Integer(request.getParameter("asiento")) - 1);
 
         } else {
-            publicoService.createSinAsientos(publico, evento, usuarioDeEventos);
+            publicoService.createSinAsientos(evento, usuarioDeEventos);
         }
-        eventoService.addPublico(evento, publico);
-        usuarioDeEventosService.addPublico(usuarioDeEventos, publico);
-        
 
         response.sendRedirect("ServletUnirseEvento?id_evento=" + evento.getId());
     }

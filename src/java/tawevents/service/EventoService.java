@@ -7,15 +7,20 @@ package tawevents.service;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import tawevents.dao.EtiquetaFacade;
 import tawevents.dao.EventoFacade;
+import tawevents.dao.UsuarioDeEventosFacade;
 import tawevents.dao.UsuarioFacade;
 import tawevents.dto.EtiquetaDTO;
 import tawevents.dto.EventoDTO;
+import tawevents.dto.PublicoDTO;
 import tawevents.dto.UsuarioDTO;
+import tawevents.dto.UsuarioDeEventosDTO;
 import tawevents.entity.Etiqueta;
 import tawevents.entity.Evento;
 import tawevents.entity.Publico;
@@ -40,6 +45,9 @@ public class EventoService {
 
      @EJB
      private EventoFacade eventoFacade;
+     
+    @EJB
+    private UsuarioDeEventosFacade usuarioDeEventosFacade;
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
      
@@ -81,49 +89,54 @@ public class EventoService {
         return res;
     }
      
+     public List<EventoDTO> findByEventosDeEtiqueta(EtiquetaDTO e) {
+         Etiqueta et = etiquetaFacade.find(e.getId());
+         return convertirAListaDTO(et.getEventoList());
+     }
+     
      public List<EventoDTO> findByTitulo(String titulo){
          List <Evento> lista = eventoFacade.findByTitulo(titulo);
          return convertirAListaDTO(lista);
-     }
-     
-     public List<Evento> findByTituloObjetoCompleto(String titulo){
-         return eventoFacade.findByTitulo(titulo);
      }
      
      public EventoDTO find(int id){
          return eventoFacade.findById(id).getDTO();
      }
      
-     public Evento findById(int id){
-         return eventoFacade.findById(id);
+     public List<EventoDTO> findAll(){
+         return convertirAListaDTO(eventoFacade.findAll());
      }
      
-     public List<Evento> findAll(){
-         return eventoFacade.findAll();
+     public List<EventoDTO> findByTituloHistorial(String palabra, UsuarioDeEventosDTO usuarioDeEventos){
+         UsuarioDeEventos user = usuarioDeEventosFacade.findById(usuarioDeEventos.getId());
+         return convertirAListaDTO(eventoFacade.findByTituloHistorial(palabra, user));
      }
      
-     public List<Evento> findByTituloHistorial(String palabra, UsuarioDeEventos usuarioDeEventos){
-         return eventoFacade.findByTituloHistorial(palabra, usuarioDeEventos);
+     public List<EventoDTO> findByEtiquetaHistorial(EtiquetaDTO e, UsuarioDeEventosDTO usuarioDeEventos){
+         UsuarioDeEventos user = usuarioDeEventosFacade.findById(usuarioDeEventos.getId());
+         Etiqueta et = etiquetaFacade.find(e.getId());
+         return convertirAListaDTO(eventoFacade.findByEtiquetaHistorial(et, user));
      }
      
-     public List<Evento> findByEtiquetaHistorial(Etiqueta e, UsuarioDeEventos usuarioDeEventos){
-         return eventoFacade.findByEtiquetaHistorial(e, usuarioDeEventos);
+     public List<EventoDTO> findAllHistorial(UsuarioDeEventosDTO usuarioDeEventos){
+         UsuarioDeEventos user = usuarioDeEventosFacade.findById(usuarioDeEventos.getId());
+         return convertirAListaDTO(eventoFacade.findAllHistorial(user));
      }
      
-     public List<Evento> findAllHistorial(UsuarioDeEventos usuarioDeEventos){
-         return eventoFacade.findAllHistorial(usuarioDeEventos);
+     public List<EventoDTO> findByTituloReserva(String palabra, UsuarioDeEventosDTO usuarioDeEventos){
+         UsuarioDeEventos user = usuarioDeEventosFacade.findById(usuarioDeEventos.getId());
+         return convertirAListaDTO(eventoFacade.findByTituloReserva(palabra, user));
      }
      
-     public List<Evento> findByTituloReserva(String palabra, UsuarioDeEventos usuarioDeEventos){
-         return eventoFacade.findByTituloReserva(palabra, usuarioDeEventos);
+     public List<EventoDTO> findByEtiquetaReserva(EtiquetaDTO e, UsuarioDeEventosDTO usuarioDeEventos){
+         UsuarioDeEventos user = usuarioDeEventosFacade.findById(usuarioDeEventos.getId());
+         Etiqueta et = etiquetaFacade.find(e.getId());
+         return convertirAListaDTO(eventoFacade.findByEtiquetaReserva(et, user));
      }
      
-     public List<Evento> findByEtiquetaReserva(Etiqueta e, UsuarioDeEventos usuarioDeEventos){
-         return eventoFacade.findByEtiquetaReserva(e, usuarioDeEventos);
-     }
-     
-     public List<Evento> findAllReserva(UsuarioDeEventos usuarioDeEventos){
-         return eventoFacade.findAllReserva(usuarioDeEventos);
+     public List<EventoDTO> findAllReserva(UsuarioDeEventosDTO usuarioDeEventos){
+         UsuarioDeEventos user = usuarioDeEventosFacade.findById(usuarioDeEventos.getId());
+         return convertirAListaDTO(eventoFacade.findAllReserva(user));
      }
      
      public void remove(EventoDTO e){
@@ -195,16 +208,26 @@ public class EventoService {
         return convertirAListaDTO(eventos);
     }
      
-    public List<Evento> findByDisponiblesEtiqueta(Etiqueta e) {
-        return eventoFacade.findByDisponiblesEtiqueta(e);
+    public List<EventoDTO> findByDisponiblesEtiqueta(EtiquetaDTO e) {
+        Etiqueta et = etiquetaFacade.find(e.getId());
+        return convertirAListaDTO(eventoFacade.findByDisponiblesEtiqueta(et));
     }
     
-    public List<Evento> findByDisponiblesMasPopulares() {
-        return eventoFacade.findByDisponiblesMasPopulares();
+    public List<EventoDTO> findByDisponiblesMasPopulares() {
+        return convertirAListaDTO(eventoFacade.findByDisponiblesMasPopulares());
     }
     
-    public List<Evento> findByDisponiblesMasCercanos() {
-        return eventoFacade.findByDisponiblesMasCercanos();
+    public List<EventoDTO> findByDisponiblesMasCercanos() {
+        return convertirAListaDTO(eventoFacade.findByDisponiblesMasCercanos());
+    }
+    
+    public Map<EventoDTO, List<PublicoDTO>> construirMap(List<EventoDTO> lista) {
+        Map<EventoDTO, List<PublicoDTO>> map = new HashMap<>();
+        List<Evento> eventos = convertirAListaEvento(convertirALaInversa(lista));
+        for (Evento e : eventos) {
+            map.put(e.getDTO(), PublicoService.convertirAListaDTO(e.getPublicoList()));
+        }
+        return map;
     }
      
      public EventoDTO buscarEvento (Integer id) {

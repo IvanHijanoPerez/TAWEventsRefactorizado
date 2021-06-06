@@ -6,10 +6,10 @@
 package tawevents.servlet;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import javax.ejb.EJB;
@@ -20,14 +20,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import tawevents.dao.EtiquetaFacade;
-import tawevents.dao.EventoFacade;
-import tawevents.entity.Etiqueta;
-import tawevents.entity.Evento;
-import tawevents.entity.Usuario;
-import tawevents.entity.UsuarioDeEventos;
+import tawevents.dto.EtiquetaDTO;
+import tawevents.dto.EventoDTO;
+import tawevents.dto.PublicoDTO;
+import tawevents.dto.UsuarioDTO;
+import tawevents.dto.UsuarioDeEventosDTO;
 import tawevents.service.EtiquetaService;
 import tawevents.service.EventoService;
+import tawevents.service.UsuarioService;
 
 /**
  *
@@ -41,6 +41,9 @@ public class ServletPaginacionReservas extends HttpServlet {
     
     @EJB
     private EtiquetaService etiquetaService;
+    
+    @EJB
+    private UsuarioService usuarioService;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -56,15 +59,15 @@ public class ServletPaginacionReservas extends HttpServlet {
         
         HttpSession session = request.getSession();
         
-        UsuarioDeEventos usuarioDeEventos = ((Usuario)session.getAttribute("usuario")).getUsuarioDeEventos();
-        Set<Evento> setEventos = new HashSet<>();
-        List<Evento> listaEventos;
+        UsuarioDeEventosDTO usuarioDeEventos = usuarioService.getUsuarioDeEventos((UsuarioDTO)session.getAttribute("usuario"));
+        Set<EventoDTO> setEventos = new HashSet<>();
+        List<EventoDTO> listaEventos;
 
         if (request.getParameter("busqueda") != null) {
             String busqueda = new String(request.getParameter("busqueda").getBytes("ISO-8859-1"), "UTF-8");
             request.setAttribute("ultimaBusqueda", busqueda);
             String palabra;
-            Etiqueta etiqueta;
+            EtiquetaDTO etiqueta;
             try (Scanner sc = new Scanner(busqueda)){
                 while (sc.hasNext()) {
                     palabra = sc.next();
@@ -73,7 +76,7 @@ public class ServletPaginacionReservas extends HttpServlet {
                     if (etiqueta != null) {
                         setEventos.addAll(eventoService.findByEtiquetaReserva(etiqueta, usuarioDeEventos));
                     }
-                } 
+                }
             }
             listaEventos = new ArrayList<>(setEventos);
         } else {
@@ -89,12 +92,14 @@ public class ServletPaginacionReservas extends HttpServlet {
 
         request.setAttribute("pagina", pageid);
         if ((pageid - 1) * 9 + 9 < listaEventos.size()) {
-            List<Evento> listaEventosPagina = listaEventos.subList((pageid - 1) * 9, (pageid - 1) * 9 + 9);
-            request.setAttribute("listaEventosPagina", listaEventosPagina);
+            List<EventoDTO> listaEventosPagina = listaEventos.subList((pageid - 1) * 9, (pageid - 1) * 9 + 9);
+            Map<EventoDTO, List<PublicoDTO>> map = eventoService.construirMap(listaEventosPagina);
+            request.setAttribute("listaEventosPagina", map);
             request.setAttribute("pagfinal", false);
         } else {
-            List<Evento> listaEventosPagina = listaEventos.subList((pageid - 1) * 9, listaEventos.size());
-            request.setAttribute("listaEventosPagina", listaEventosPagina);
+            List<EventoDTO> listaEventosPagina = listaEventos.subList((pageid - 1) * 9, listaEventos.size());
+            Map<EventoDTO, List<PublicoDTO>> map = eventoService.construirMap(listaEventosPagina);
+            request.setAttribute("listaEventosPagina", map);
             request.setAttribute("pagfinal", true);
         }
 

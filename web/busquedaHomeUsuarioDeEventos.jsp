@@ -4,12 +4,13 @@
     Author     : David
 --%>
 
-<%@page import="tawevents.entity.Publico"%>
+<%@page import="java.util.Map"%>
+<%@page import="tawevents.dto.PublicoDTO"%>
+<%@page import="tawevents.dto.EventoDTO"%>
+<%@page import="tawevents.dto.UsuarioDTO"%>
 <%@page import="java.util.Date"%>
 <%@page import="java.text.SimpleDateFormat"%>
-<%@page import="tawevents.entity.Evento"%>
 <%@page import="java.util.List"%>
-<%@page import="tawevents.entity.Usuario"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -41,14 +42,14 @@
     </head>
 
     <%
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        UsuarioDTO usuario = (UsuarioDTO) session.getAttribute("usuario");
         if (usuario == null) {
     %>        
     <jsp:forward page="inicioSesion.jsp" />
 
     <%
         }
-        List<Evento> listaEventosPagina = (List) request.getAttribute("listaEventosPagina");
+        Map<EventoDTO, List<PublicoDTO>> listaEventosPagina = (Map<EventoDTO, List<PublicoDTO>>) request.getAttribute("listaEventosPagina");
         Integer pagina = (Integer) request.getAttribute("pagina");
         Boolean paginaFinal = (Boolean) request.getAttribute("pagfinal");
         String busquedaAnterior = (String) request.getAttribute("ultimaBusqueda");
@@ -92,30 +93,30 @@
         <div class="row row-cols-1 row-cols-md-3">
             <!--TODO: Bucle de cada elemento-->
             <%
-                for (Evento evento : listaEventosPagina) {
+                for (Map.Entry<EventoDTO, List<PublicoDTO>> entry : listaEventosPagina.entrySet()) {
             %>
             <div class="col mb-4">
                 <div class="card h-100">
-                    <img src="<%=evento.getImagen()%>" class="card-img-top">
+                    <img src="<%=entry.getKey().getImagen()%>" class="card-img-top">
                     <div class="card-body">
-                        <h5 class="card-title"><%=evento.getTitulo()%></h5>
-                        <p class="card-text"><%=evento.getDescripcion()%></p>
+                        <h5 class="card-title"><%=entry.getKey().getTitulo()%></h5>
+                        <p class="card-text"><%=entry.getKey().getDescripcion()%></p>
                         <%
                             int i = 0;
                             boolean estaDentro = false;
-                            while (i < evento.getPublicoList().size() && !estaDentro) {
-                                if (evento.getPublicoList().get(i).getUsuarioDeEventos().equals(usuario.getUsuarioDeEventos())) {
+                            while (i < entry.getValue().size() && !estaDentro) {
+                                if (entry.getValue().get(i).getUsuarioDeEventos() == (usuario.getUsuarioDeEventos())) {
                                     estaDentro = true;
                                 }
                                 i++;
                             }
 
                             if (!estaDentro) {
-                                if (date.before(evento.getFechaLimEntradas())) {
-                                    if (evento.getAforoMax() > evento.getPublicoList().size()) {
+                                if (date.before(entry.getKey().getFechaLimEntradas())) {
+                                    if (entry.getKey().getAforoMax() > entry.getValue().size()) {
                         %>
 
-                        <a href="ServletUnirseEvento?id_evento=<%=evento.getId()%>" class="btn btn-primary">Reservar »</a>
+                        <a href="ServletUnirseEvento?id_evento=<%=entry.getKey().getId()%>" class="btn btn-primary">Reservar »</a>
 
                         <%
                         } else {
@@ -125,7 +126,7 @@
 
                         <%
                             }
-                        } else if (date.after(evento.getFechaLimEntradas())) {
+                        } else if (date.after(entry.getKey().getFechaLimEntradas())) {
                         %>
 
                         <div class="estado-evento">Fecha expirada</div>
@@ -133,18 +134,16 @@
                         <%
                             }
                         } else {
-                            if (date.before(evento.getFechaLimEntradas())) {
+                            if (date.before(entry.getKey().getFechaLimEntradas())) {
                         %>
 
-                        <a href="ServletUnirseEvento?id_evento=<%=evento.getId()%>" class="btn btn-primary">Editar reserva</a>
+                        <a href="ServletUnirseEvento?id_evento=<%=entry.getKey().getId()%>" class="btn btn-primary">Editar reserva</a>
 
                         <%
-
-                        } else if (date.after(evento.getFechaLimEntradas())) {
-                        
+                        } else if (date.after(entry.getKey().getFechaLimEntradas())) {
                         %>
 
-                        <a href="ServletUnirseEvento?id_evento=<%=evento.getId()%>" class="btn btn-primary">Ver reserva</a>
+                        <a href="ServletUnirseEvento?id_evento=<%=entry.getKey().getId()%>" class="btn btn-primary">Ver reserva</a>
 
                         <%
                                 }

@@ -16,12 +16,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import tawevents.dao.EtiquetaFacade;
-import tawevents.dao.EventoFacade;
-import tawevents.entity.Etiqueta;
-import tawevents.entity.Evento;
-import tawevents.entity.Usuario;
-import tawevents.entity.UsuarioDeEventos;
+import tawevents.dto.EtiquetaDTO;
+import tawevents.dto.EventoDTO;
+import tawevents.dto.UsuarioDTO;
 import tawevents.service.EtiquetaService;
 import tawevents.service.EventoService;
 import tawevents.service.UsuarioDeEventosService;
@@ -38,6 +35,9 @@ public class ServletHomeUsuarioDeEventos extends HttpServlet {
     
     @EJB
     private EtiquetaService etiquetaService;
+    
+    @EJB
+    private UsuarioDeEventosService usuarioDeEventosService;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -53,16 +53,16 @@ public class ServletHomeUsuarioDeEventos extends HttpServlet {
         
         HttpSession session = request.getSession();
 
-        Etiqueta etiqueta = etiquetaService.findByNombreExacto(((Usuario)session.getAttribute("usuario")).getUsuarioDeEventos().getCiudad());
+        EtiquetaDTO etiqueta = etiquetaService.findByNombreExacto(usuarioDeEventosService.findById(((UsuarioDTO)session.getAttribute("usuario")).getUsuarioDeEventos()).getCiudad());
         if (etiqueta != null) {
-            List<Evento> listaEnCiudad = this.eventoService.findByDisponiblesEtiqueta(etiquetaService.findByNombreExacto(((Usuario)session.getAttribute("usuario")).getUsuarioDeEventos().getCiudad()));
+            List<EventoDTO> listaEnCiudad = this.eventoService.findByDisponiblesEtiqueta(etiqueta);
             request.setAttribute("listaEnCiudad", listaEnCiudad);
         } else {
             request.setAttribute("listaEnCiudad", null);
         }
-        List<Evento> listaPopulares = this.eventoService.findByDisponiblesMasPopulares();
+        List<EventoDTO> listaPopulares = this.eventoService.findByDisponiblesMasPopulares();
         request.setAttribute("listaPopulares", listaPopulares);
-        List<Evento> listaProximos = this.eventoService.findByDisponiblesMasCercanos();
+        List<EventoDTO> listaProximos = this.eventoService.findByDisponiblesMasCercanos();
         request.setAttribute("listaProximos", listaProximos);
 
         RequestDispatcher rd = request.getRequestDispatcher("homeUsuarioDeEventos.jsp");

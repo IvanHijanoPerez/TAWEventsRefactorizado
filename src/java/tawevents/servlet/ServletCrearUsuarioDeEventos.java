@@ -8,9 +8,7 @@ package tawevents.servlet;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -23,10 +21,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import tawevents.dao.UsuarioDeEventosFacade;
-import tawevents.dao.UsuarioFacade;
-import tawevents.entity.Usuario;
-import tawevents.entity.UsuarioDeEventos;
+import tawevents.dto.UsuarioDTO;
+import tawevents.dto.UsuarioDeEventosDTO;
 import tawevents.service.UsuarioDeEventosService;
 import tawevents.service.UsuarioService;
 
@@ -63,8 +59,7 @@ public class ServletCrearUsuarioDeEventos extends HttpServlet {
         String strErrorNick = "", strErrorCorreo = "", strErrorFormato = "", strErrorConfirmar = "", strErrorNacimiento = "";
         String nick, correoElectronico, contrasena, confirmarContrasena, nombre, apellidos, ciudad, sexo;
         Date fechaNacimiento = null;
-        UsuarioDeEventos usuarioEventos;
-        Usuario usuarioBase;
+        UsuarioDeEventosDTO usuarioEventos;
         
         // ----------------------
         
@@ -124,7 +119,7 @@ public class ServletCrearUsuarioDeEventos extends HttpServlet {
             
         } else { // Si no hay errores
             
-            usuarioEventos = new UsuarioDeEventos();
+            usuarioEventos = new UsuarioDeEventosDTO();
             usuarioEventos.setNombre(nombre);
             usuarioEventos.setApellidos(apellidos);
             usuarioEventos.setCorreo(correoElectronico);
@@ -132,7 +127,7 @@ public class ServletCrearUsuarioDeEventos extends HttpServlet {
             usuarioEventos.setSexo(sexo);
             usuarioEventos.setFechaNacimiento(fechaNacimiento);
             
-            Usuario usuario = usuarioService.guardarUsuario(null, nick, contrasena, "usuariodeeventos", usuarioEventos);
+            UsuarioDTO usuario = usuarioService.guardarUsuario(null, nick, contrasena, "usuariodeeventos", usuarioEventos);
             
             session.setAttribute("usuario", usuario);
             

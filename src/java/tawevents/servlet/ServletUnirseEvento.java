@@ -16,15 +16,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import tawevents.dao.EventoFacade;
-import tawevents.dao.PublicoFacade;
+import tawevents.dto.EventoDTO;
 import tawevents.dto.PublicoDTO;
-import tawevents.entity.Evento;
-import tawevents.entity.Publico;
-import tawevents.entity.Usuario;
-import tawevents.entity.UsuarioDeEventos;
+import tawevents.dto.UsuarioDTO;
 import tawevents.service.EventoService;
 import tawevents.service.PublicoService;
+import tawevents.service.UsuarioService;
 
 /**
  *
@@ -38,6 +35,9 @@ public class ServletUnirseEvento extends HttpServlet {
     
     @EJB
     private PublicoService publicoService;
+    
+    @EJB
+    private UsuarioService usuarioService;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -53,17 +53,20 @@ public class ServletUnirseEvento extends HttpServlet {
         
         HttpSession session = request.getSession();
         
-        Evento evento = eventoService.findById(new Integer(request.getParameter("id_evento")));
+        EventoDTO evento = eventoService.find(new Integer(request.getParameter("id_evento")));
         request.setAttribute("evento", evento);
-        List<Publico> publicos = publicoService.findByUsuarioYEvento(((Usuario)session.getAttribute("usuario")).getUsuarioDeEventos(), evento);
-        request.setAttribute("publicos", publicos);
+        List<PublicoDTO> publicos = publicoService.findByUsuario(usuarioService.getUsuarioDeEventos((UsuarioDTO)session.getAttribute("usuario")));
+        request.setAttribute("publicosUs", publicos);
+        List<PublicoDTO> publicoDeEvento = publicoService.findByEvento(evento);
+        request.setAttribute("publicosEv", publicoDeEvento);
+        
         
         boolean [][] ocupados = null;
         if (evento.getAsientosAsignados()) {
             ocupados = new boolean[evento.getNumFilas()][evento.getAsientosPorFila()];
             for (int i = 0; i < evento.getNumFilas(); i++) {
                 for (int j = 0; j < evento.getAsientosPorFila(); j++) {
-                    ocupados[i][j] = buscarOcupado(evento.getPublicoList(), i, j);
+                    ocupados[i][j] = buscarOcupado(publicoDeEvento, i, j);
                 }
             }
         }
@@ -113,8 +116,8 @@ public class ServletUnirseEvento extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
-    private boolean buscarOcupado(List<Publico> publicoList, int i, int j) {
-        for (Publico pub : publicoList) {
+    private boolean buscarOcupado(List<PublicoDTO> publicoList, int i, int j) {
+        for (PublicoDTO pub : publicoList) {
             if (pub.getFila() == i && pub.getAsiento() == j) {
                 return true;
             }

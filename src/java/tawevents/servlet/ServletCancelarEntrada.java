@@ -15,9 +15,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import tawevents.dao.EventoFacade;
-import tawevents.dao.PublicoFacade;
-import tawevents.dao.UsuarioDeEventosFacade;
+import tawevents.dto.EventoDTO;
+import tawevents.dto.PublicoDTO;
+import tawevents.dto.UsuarioDTO;
+import tawevents.dto.UsuarioDeEventosDTO;
 import tawevents.entity.Evento;
 import tawevents.entity.Publico;
 import tawevents.entity.Usuario;
@@ -25,6 +26,7 @@ import tawevents.entity.UsuarioDeEventos;
 import tawevents.service.EventoService;
 import tawevents.service.PublicoService;
 import tawevents.service.UsuarioDeEventosService;
+import tawevents.service.UsuarioService;
 
 /**
  *
@@ -41,6 +43,9 @@ public class ServletCancelarEntrada extends HttpServlet {
     
     @EJB
     UsuarioDeEventosService usuarioDeEventosService;
+    
+    @EJB
+    UsuarioService usuarioService;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -56,15 +61,9 @@ public class ServletCancelarEntrada extends HttpServlet {
         
         HttpSession session = request.getSession();
         
-        Publico publico = publicoService.findByID(new Integer(request.getParameter("id_entrada")));
-        Evento evento = publico.getEvento();
-        UsuarioDeEventos usuarioDeEventos = ((Usuario)session.getAttribute("usuario")).getUsuarioDeEventos();
-        
+        PublicoDTO publico = publicoService.findByID(new Integer(request.getParameter("id_entrada")));
+        EventoDTO evento = publicoService.getEvento(publico); 
         publicoService.borrar(publico);
-        
-        eventoService.removePublico(evento, publico);
-
-        usuarioDeEventosService.removePublico(usuarioDeEventos, publico);
         
         response.sendRedirect("ServletUnirseEvento?id_evento=" + evento.getId());
     }

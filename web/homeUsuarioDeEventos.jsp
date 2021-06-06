@@ -4,6 +4,8 @@
     Author     : David
 --%>
 
+<%@page import="tawevents.dto.EventoDTO"%>
+<%@page import="tawevents.dto.UsuarioDTO"%>
 <%@page import="tawevents.entity.Evento"%>
 <%@page import="java.util.List"%>
 <%@page import="tawevents.entity.Usuario"%>
@@ -38,7 +40,7 @@
     </head>
 
     <%
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        UsuarioDTO usuario = (UsuarioDTO) session.getAttribute("usuario");
         if (usuario == null) {
     %>        
     <jsp:forward page="inicioSesion.jsp" />
@@ -46,9 +48,9 @@
     <%
         }
         String ciudad = (String) request.getAttribute("ciudad");
-        List<Evento> listaEnCiudad = (List) request.getAttribute("listaEnCiudad");
-        List<Evento> listaPopulares = (List) request.getAttribute("listaPopulares");
-        List<Evento> listaProximos = (List) request.getAttribute("listaProximos");
+        List<EventoDTO> listaEnCiudad = (List) request.getAttribute("listaEnCiudad");
+        List<EventoDTO> listaPopulares = (List) request.getAttribute("listaPopulares");
+        List<EventoDTO> listaProximos = (List) request.getAttribute("listaProximos");
     %>
 
     <body>
@@ -82,12 +84,12 @@
             <div class="background-ciudad">
 
                 <div class="texto-categoria" style="font-family: sans-serif;font-size: 50px;padding-left: 2em;padding-top: 1em;">
-                    En <%=usuario.getUsuarioDeEventos().getCiudad()%>
+                    En <%=ciudad%>
                 </div>
 
                 <div class="gallery js-flickity" data-flickity-options='{ "wrapAround": true, "freeScroll": true, "freeScrollFriction": 0.5, "pageDots": false }'>
                     <%
-                        for (Evento evento : listaEnCiudad) {
+                        for (EventoDTO evento : listaEnCiudad) {
                     %>
                     <div class="gallery-cell">
                         <img src="<%=evento.getImagen()%>">
@@ -120,7 +122,7 @@
 
                 <div class="gallery js-flickity" data-flickity-options='{ "wrapAround": true, "freeScroll": true, "freeScrollFriction": 0.5, "pageDots": false }'>
                     <%
-                        for (Evento evento : listaPopulares) {
+                        for (EventoDTO evento : listaPopulares) {
                     %>
                     <div class="gallery-cell">
                         <img src="<%=evento.getImagen()%>">
@@ -153,7 +155,7 @@
 
                 <div class="gallery js-flickity" data-flickity-options='{ "wrapAround": true, "freeScroll": true, "freeScrollFriction": 0.5, "pageDots": false }'>
                     <%
-                        for (Evento evento : listaProximos) {
+                        for (EventoDTO evento : listaProximos) {
                     %>
                     <div class="gallery-cell">
                         <img src="<%=evento.getImagen()%>">

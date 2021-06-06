@@ -62,21 +62,16 @@ public class ServletInicioAutenticar extends HttpServlet {
                     request.setAttribute("error", strError);
                     strTo = "inicioSesion.jsp";
                 } else { // El usuario está en la BD
-                    
+                    session.setAttribute("usuario", usuario);
                     if (usuario.getTipoUsuario().equals("administrador")) {
-                        session.setAttribute("usuario", usuario);
                         strTo = "homeAdmin.jsp";
                     } else if (usuario.getTipoUsuario().equals("creadordeeventos")) {
-                        session.setAttribute("usuario", usuario);
                         strTo = "ServletCreadorDeEventosListar";
                     } else if (usuario.getTipoUsuario().equals("teleoperador")) {
-                        session.setAttribute("usuario", usuario);
+                        
                     } else if (usuario.getTipoUsuario().equals("analistadeeventos")) {
-                        session.setAttribute("usuario", usuario);
                         strTo = "homeAnalista.jsp";
                     } else {
-                        Usuario usuarioCompleto = this.usuarioService.comprobarCredencialesUsuario(strNick, strClave);
-                        session.setAttribute("usuario", usuarioCompleto);
                         strTo = "ServletHomeUsuarioDeEventos";
                     }
                 }

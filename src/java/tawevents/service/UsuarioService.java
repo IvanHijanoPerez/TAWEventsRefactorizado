@@ -9,9 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import tawevents.dao.UsuarioDeEventosFacade;
 import tawevents.dao.UsuarioFacade;
 import tawevents.dto.EtiquetaDTO;
 import tawevents.dto.UsuarioDTO;
+import tawevents.dto.UsuarioDeEventosDTO;
 import tawevents.entity.Usuario;
 import tawevents.entity.UsuarioDeEventos;
 
@@ -24,6 +26,9 @@ public class UsuarioService {
 
     @EJB
     private UsuarioFacade usuarioFacade;
+    
+    @EJB
+    private UsuarioDeEventosFacade usuarioDeEventosFacade;
 
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
@@ -100,6 +105,11 @@ public class UsuarioService {
         }
     }
     
+    public UsuarioDeEventosDTO getUsuarioDeEventos(UsuarioDTO user) {
+        Usuario usuario = usuarioFacade.find(user.getId());
+        return usuario.getUsuarioDeEventos().getDTO();
+    }
+    
     public void borrarUsuario (Integer id) {
         Usuario usuario = this.usuarioFacade.find(id);
         this.usuarioFacade.remove(usuario);
@@ -129,8 +139,10 @@ public class UsuarioService {
         }        
     }
     
-    public Usuario guardarUsuario (String id, String nickname,  String contrasena, 
-             String tipoUsuario, UsuarioDeEventos usuarioDeEventos) {
+    public UsuarioDTO guardarUsuario (String id, String nickname,  String contrasena, 
+             String tipoUsuario, UsuarioDeEventosDTO usuarioDeEventos) {
+        
+        UsuarioDeEventos userEv = usuarioDeEventosFacade.findById(usuarioDeEventos.getId());
         Usuario usuario; 
 
         if (id == null || id.isEmpty()) { // Crear nuevo cliente
@@ -141,12 +153,14 @@ public class UsuarioService {
         usuario.setNickname(nickname);
         usuario.setContrasena(contrasena);
         usuario.setTipoUsuario(tipoUsuario);
+        usuario.setUsuarioDeEventos(userEv);
+        
 
         if (id == null || id.isEmpty()) { // Crear nuevo cliente        
             this.usuarioFacade.create(usuario);
         } else { // Editar cliente existente
             this.usuarioFacade.edit(usuario);
         }
-        return usuario;
+        return usuario.getDTO();
     }
 }
