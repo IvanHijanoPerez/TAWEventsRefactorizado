@@ -22,6 +22,9 @@ import tawevents.entity.Evento;
 import tawevents.entity.Publico;
 import tawevents.entity.Usuario;
 import tawevents.entity.UsuarioDeEventos;
+import tawevents.service.EventoService;
+import tawevents.service.PublicoService;
+import tawevents.service.UsuarioDeEventosService;
 
 /**
  *
@@ -31,13 +34,13 @@ import tawevents.entity.UsuarioDeEventos;
 public class ServletCancelarEntrada extends HttpServlet {
     
     @EJB
-    PublicoFacade publicoFacade;
+    PublicoService publicoService;
     
     @EJB
-    EventoFacade eventoFacade;
+    EventoService eventoService;
     
     @EJB
-    UsuarioDeEventosFacade usuarioDeEventosFacade;
+    UsuarioDeEventosService usuarioDeEventosService;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -53,21 +56,15 @@ public class ServletCancelarEntrada extends HttpServlet {
         
         HttpSession session = request.getSession();
         
-        Publico publico = publicoFacade.findByID(new Integer(request.getParameter("id_entrada")));
+        Publico publico = publicoService.findByID(new Integer(request.getParameter("id_entrada")));
         Evento evento = publico.getEvento();
         UsuarioDeEventos usuarioDeEventos = ((Usuario)session.getAttribute("usuario")).getUsuarioDeEventos();
         
-        publicoFacade.remove(publico);
+        publicoService.borrar(publico);
         
-        List<Publico> listaPublico = evento.getPublicoList();
-        listaPublico.remove(publico);
-        evento.setPublicoList(listaPublico);
-        eventoFacade.edit(evento);
-        
-        List<Publico> listaAsistencias = usuarioDeEventos.getPublicoList();
-        listaAsistencias.remove(publico);
-        usuarioDeEventos.setPublicoList(listaAsistencias);
-        usuarioDeEventosFacade.edit(usuarioDeEventos);
+        eventoService.removePublico(evento, publico);
+
+        usuarioDeEventosService.removePublico(usuarioDeEventos, publico);
         
         response.sendRedirect("ServletUnirseEvento?id_evento=" + evento.getId());
     }

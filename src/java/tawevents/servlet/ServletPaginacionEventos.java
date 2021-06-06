@@ -22,6 +22,8 @@ import tawevents.dao.EtiquetaFacade;
 import tawevents.dao.EventoFacade;
 import tawevents.entity.Etiqueta;
 import tawevents.entity.Evento;
+import tawevents.service.EtiquetaService;
+import tawevents.service.EventoService;
 
 /**
  *
@@ -31,10 +33,10 @@ import tawevents.entity.Evento;
 public class ServletPaginacionEventos extends HttpServlet {
 
     @EJB
-    private EventoFacade eventoFacade;
+    private EventoService eventoService;
     
     @EJB
-    private EtiquetaFacade etiquetaFacade;
+    private EtiquetaService etiquetaService;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -60,8 +62,8 @@ public class ServletPaginacionEventos extends HttpServlet {
             try (Scanner sc = new Scanner(busqueda)){
                 while (sc.hasNext()) {
                     palabra = sc.next();
-                    setEventos.addAll(eventoFacade.findByTitulo(palabra));
-                    etiqueta = etiquetaFacade.findByNombreExacto(palabra);
+                    setEventos.addAll(eventoService.findByTituloObjetoCompleto(palabra));
+                    etiqueta = etiquetaService.findByNombreExacto(palabra);
                     if (etiqueta != null) {
                         setEventos.addAll(etiqueta.getEventoList());
                     }
@@ -69,7 +71,7 @@ public class ServletPaginacionEventos extends HttpServlet {
             }
             listaEventos = new ArrayList<>(setEventos);
         } else {
-            listaEventos = this.eventoFacade.findAll();
+            listaEventos = eventoService.findAll();
         }
 
         Integer pageid;

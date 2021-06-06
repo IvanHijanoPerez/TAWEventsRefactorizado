@@ -45,6 +45,7 @@
 
     <%
         }
+        String ciudad = (String) request.getAttribute("ciudad");
         List<Evento> listaEnCiudad = (List) request.getAttribute("listaEnCiudad");
         List<Evento> listaPopulares = (List) request.getAttribute("listaPopulares");
         List<Evento> listaProximos = (List) request.getAttribute("listaProximos");

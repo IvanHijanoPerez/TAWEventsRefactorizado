@@ -11,6 +11,7 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import tawevents.dao.UsuarioDeEventosFacade;
 import tawevents.dto.UsuarioDeEventosDTO;
+import tawevents.entity.Publico;
 import tawevents.entity.UsuarioDeEventos;
 
 /**
@@ -39,4 +40,21 @@ public class UsuarioDeEventosService {
         return usuarioDeEventosFacade.findById(id);
     }
     
+    public Boolean esCorreoUnico(String correo) {
+        return usuarioDeEventosFacade.esCorreoUnico(correo);
+    }
+    
+    public void addPublico(UsuarioDeEventos usuarioDeEventos, Publico publico) {
+        List<Publico> listaAsistencias = usuarioDeEventos.getPublicoList();
+        listaAsistencias.add(publico);
+        usuarioDeEventos.setPublicoList(listaAsistencias);
+        usuarioDeEventosFacade.edit(usuarioDeEventos);
+    }
+    
+    public void removePublico(UsuarioDeEventos usuarioDeEventos, Publico publico) {
+        List<Publico> listaAsistencias = usuarioDeEventos.getPublicoList();
+        listaAsistencias.remove(publico);
+        usuarioDeEventos.setPublicoList(listaAsistencias);
+        usuarioDeEventosFacade.edit(usuarioDeEventos);
+    }
 }

@@ -27,6 +27,8 @@ import tawevents.dao.UsuarioDeEventosFacade;
 import tawevents.dao.UsuarioFacade;
 import tawevents.entity.Usuario;
 import tawevents.entity.UsuarioDeEventos;
+import tawevents.service.UsuarioDeEventosService;
+import tawevents.service.UsuarioService;
 
 /**
  *
@@ -36,10 +38,10 @@ import tawevents.entity.UsuarioDeEventos;
 public class ServletCrearUsuarioDeEventos extends HttpServlet {
     
     @EJB
-    private UsuarioFacade UsuarioFacade;
+    private UsuarioService usuarioService;
     
     @EJB
-    private UsuarioDeEventosFacade UsuarioDeEventosFacade;
+    private UsuarioDeEventosService usuarioDeEventosService;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -89,8 +91,8 @@ public class ServletCrearUsuarioDeEventos extends HttpServlet {
         Pattern regexPattern = Pattern.compile("^(.+)@(.+)$");
         Matcher regMatcher   = regexPattern.matcher(correoElectronico);
         
-        Boolean nickUnico = UsuarioFacade.esNickUnico(nick);
-        Boolean correoUnico = UsuarioDeEventosFacade.esCorreoUnico(correoElectronico);
+        Boolean nickUnico = usuarioService.esNickUnico(nick);
+        Boolean correoUnico = usuarioDeEventosService.esCorreoUnico(correoElectronico);
         Boolean formatoCorreoValido = regMatcher.matches();
         Boolean coincidenContrasenas = contrasena.equals(confirmarContrasena);
         Boolean fechaNacimientoCorrecta = currentDate.after(fechaNacimiento);
@@ -130,15 +132,9 @@ public class ServletCrearUsuarioDeEventos extends HttpServlet {
             usuarioEventos.setSexo(sexo);
             usuarioEventos.setFechaNacimiento(fechaNacimiento);
             
-            usuarioBase = new Usuario();
-            usuarioBase.setNickname(nick);
-            usuarioBase.setContrasena(contrasena);
-            usuarioBase.setTipoUsuario("usuariodeeventos");
-            usuarioBase.setUsuarioDeEventos(usuarioEventos);
+            Usuario usuario = usuarioService.guardarUsuario(null, nick, contrasena, "usuariodeeventos", usuarioEventos);
             
-            this.UsuarioFacade.create(usuarioBase);
-            
-            session.setAttribute("usuario", usuarioBase);
+            session.setAttribute("usuario", usuario);
             
             response.sendRedirect("ServletHomeUsuarioDeEventos");
         }

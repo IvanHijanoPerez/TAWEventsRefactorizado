@@ -26,6 +26,8 @@ import tawevents.entity.Etiqueta;
 import tawevents.entity.Evento;
 import tawevents.entity.Usuario;
 import tawevents.entity.UsuarioDeEventos;
+import tawevents.service.EtiquetaService;
+import tawevents.service.EventoService;
 
 /**
  *
@@ -35,10 +37,10 @@ import tawevents.entity.UsuarioDeEventos;
 public class ServletPaginacionReservas extends HttpServlet {
     
     @EJB
-    private EventoFacade eventoFacade;
+    private EventoService eventoService;
     
     @EJB
-    private EtiquetaFacade etiquetaFacade;
+    private EtiquetaService etiquetaService;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -66,16 +68,16 @@ public class ServletPaginacionReservas extends HttpServlet {
             try (Scanner sc = new Scanner(busqueda)){
                 while (sc.hasNext()) {
                     palabra = sc.next();
-                    setEventos.addAll(eventoFacade.findByTituloReserva(palabra, usuarioDeEventos));
-                    etiqueta = etiquetaFacade.findByNombreExacto(palabra);
+                    setEventos.addAll(eventoService.findByTituloReserva(palabra, usuarioDeEventos));
+                    etiqueta = etiquetaService.findByNombreExacto(palabra);
                     if (etiqueta != null) {
-                        setEventos.addAll(eventoFacade.findByEtiquetaReserva(etiqueta, usuarioDeEventos));
+                        setEventos.addAll(eventoService.findByEtiquetaReserva(etiqueta, usuarioDeEventos));
                     }
                 } 
             }
             listaEventos = new ArrayList<>(setEventos);
         } else {
-            listaEventos = this.eventoFacade.findAllReserva(usuarioDeEventos);
+            listaEventos = this.eventoService.findAllReserva(usuarioDeEventos);
         }
 
         Integer pageid;

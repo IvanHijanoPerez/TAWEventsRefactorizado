@@ -36,6 +36,10 @@ public class PublicoService {
             return null;
         }
     }
+    
+    public Publico findByID(Integer id) {
+        return publicoFacade.findByID(id);
+    }
 
     public List<Publico> findByUsuarioYEvento(UsuarioDeEventos usuarioDeEventos, Evento evento) {
         List<Publico> publicos = publicoFacade.findByUsuarioYEvento(usuarioDeEventos, evento);
@@ -54,5 +58,9 @@ public class PublicoService {
         publico.setEvento(evento);
         publico.setUsuarioDeEventos(usuarioDeEventos);
         publicoFacade.create(publico);
+    }
+    
+    public void borrar(Publico publico) {
+        publicoFacade.remove(publico);
     }
 }

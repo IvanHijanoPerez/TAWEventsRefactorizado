@@ -13,6 +13,7 @@ import tawevents.dao.UsuarioFacade;
 import tawevents.dto.EtiquetaDTO;
 import tawevents.dto.UsuarioDTO;
 import tawevents.entity.Usuario;
+import tawevents.entity.UsuarioDeEventos;
 
 /**
  *
@@ -55,6 +56,11 @@ public class UsuarioService {
             return null;
         }        
     }
+    
+    public Boolean esNickUnico(String nick) {
+        return usuarioFacade.esNickUnico(nick);
+    }
+    
     
     public List<UsuarioDTO> filtroNick(String nick){
         List<Usuario> usuarios = usuarioFacade.findBySimilarNick(nick);
@@ -121,5 +127,26 @@ public class UsuarioService {
         } else { // Editar cliente existente
             this.usuarioFacade.edit(usuario);
         }        
+    }
+    
+    public Usuario guardarUsuario (String id, String nickname,  String contrasena, 
+             String tipoUsuario, UsuarioDeEventos usuarioDeEventos) {
+        Usuario usuario; 
+
+        if (id == null || id.isEmpty()) { // Crear nuevo cliente
+            usuario = new Usuario();            
+        } else { // Editar cliente existente
+            usuario = this.usuarioFacade.find(new Integer(id));
+        }
+        usuario.setNickname(nickname);
+        usuario.setContrasena(contrasena);
+        usuario.setTipoUsuario(tipoUsuario);
+
+        if (id == null || id.isEmpty()) { // Crear nuevo cliente        
+            this.usuarioFacade.create(usuario);
+        } else { // Editar cliente existente
+            this.usuarioFacade.edit(usuario);
+        }
+        return usuario;
     }
 }

@@ -22,7 +22,9 @@ import tawevents.entity.Evento;
 import tawevents.entity.Publico;
 import tawevents.entity.Usuario;
 import tawevents.entity.UsuarioDeEventos;
+import tawevents.service.EventoService;
 import tawevents.service.PublicoService;
+import tawevents.service.UsuarioDeEventosService;
 
 /**
  *
@@ -35,10 +37,10 @@ public class ServletSolicitarEntrada extends HttpServlet {
     PublicoService publicoService;
 
     @EJB
-    EventoFacade eventoFacade;
+    EventoService eventoService;
 
     @EJB
-    UsuarioDeEventosFacade usuarioDeEventosFacade;
+    UsuarioDeEventosService usuarioDeEventosService;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -53,7 +55,7 @@ public class ServletSolicitarEntrada extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
-        Evento evento = eventoFacade.findById(new Integer(request.getParameter("id_evento")));
+        Evento evento = eventoService.findById(new Integer(request.getParameter("id_evento")));
         UsuarioDeEventos usuarioDeEventos = ((Usuario) session.getAttribute("usuario")).getUsuarioDeEventos();
         Publico publico = new Publico();
 
@@ -63,17 +65,9 @@ public class ServletSolicitarEntrada extends HttpServlet {
         } else {
             publicoService.createSinAsientos(publico, evento, usuarioDeEventos);
         }
-
+        eventoService.addPublico(evento, publico);
+        usuarioDeEventosService.addPublico(usuarioDeEventos, publico);
         
-//        List<Publico> listaPublico = evento.getPublicoList();
-//        listaPublico.add(publico);
-//        evento.setPublicoList(listaPublico);
-//        eventoFacade.edit(evento);
-//
-//        List<Publico> listaAsistencias = usuarioDeEventos.getPublicoList();
-//        listaAsistencias.add(publico);
-//        usuarioDeEventos.setPublicoList(listaAsistencias);
-//        usuarioDeEventosFacade.edit(usuarioDeEventos);
 
         response.sendRedirect("ServletUnirseEvento?id_evento=" + evento.getId());
     }

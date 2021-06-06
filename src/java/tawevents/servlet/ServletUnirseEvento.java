@@ -23,6 +23,7 @@ import tawevents.entity.Evento;
 import tawevents.entity.Publico;
 import tawevents.entity.Usuario;
 import tawevents.entity.UsuarioDeEventos;
+import tawevents.service.EventoService;
 import tawevents.service.PublicoService;
 
 /**
@@ -33,7 +34,7 @@ import tawevents.service.PublicoService;
 public class ServletUnirseEvento extends HttpServlet {
     
     @EJB
-    private EventoFacade eventoFacade;
+    private EventoService eventoService;
     
     @EJB
     private PublicoService publicoService;
@@ -52,7 +53,7 @@ public class ServletUnirseEvento extends HttpServlet {
         
         HttpSession session = request.getSession();
         
-        Evento evento = eventoFacade.findById(new Integer(request.getParameter("id_evento")));
+        Evento evento = eventoService.findById(new Integer(request.getParameter("id_evento")));
         request.setAttribute("evento", evento);
         List<Publico> publicos = publicoService.findByUsuarioYEvento(((Usuario)session.getAttribute("usuario")).getUsuarioDeEventos(), evento);
         request.setAttribute("publicos", publicos);

@@ -18,7 +18,9 @@ import tawevents.dto.EventoDTO;
 import tawevents.dto.UsuarioDTO;
 import tawevents.entity.Etiqueta;
 import tawevents.entity.Evento;
+import tawevents.entity.Publico;
 import tawevents.entity.Usuario;
+import tawevents.entity.UsuarioDeEventos;
 
 /**
  *
@@ -84,8 +86,44 @@ public class EventoService {
          return convertirAListaDTO(lista);
      }
      
+     public List<Evento> findByTituloObjetoCompleto(String titulo){
+         return eventoFacade.findByTitulo(titulo);
+     }
+     
      public EventoDTO find(int id){
          return eventoFacade.findById(id).getDTO();
+     }
+     
+     public Evento findById(int id){
+         return eventoFacade.findById(id);
+     }
+     
+     public List<Evento> findAll(){
+         return eventoFacade.findAll();
+     }
+     
+     public List<Evento> findByTituloHistorial(String palabra, UsuarioDeEventos usuarioDeEventos){
+         return eventoFacade.findByTituloHistorial(palabra, usuarioDeEventos);
+     }
+     
+     public List<Evento> findByEtiquetaHistorial(Etiqueta e, UsuarioDeEventos usuarioDeEventos){
+         return eventoFacade.findByEtiquetaHistorial(e, usuarioDeEventos);
+     }
+     
+     public List<Evento> findAllHistorial(UsuarioDeEventos usuarioDeEventos){
+         return eventoFacade.findAllHistorial(usuarioDeEventos);
+     }
+     
+     public List<Evento> findByTituloReserva(String palabra, UsuarioDeEventos usuarioDeEventos){
+         return eventoFacade.findByTituloReserva(palabra, usuarioDeEventos);
+     }
+     
+     public List<Evento> findByEtiquetaReserva(Etiqueta e, UsuarioDeEventos usuarioDeEventos){
+         return eventoFacade.findByEtiquetaReserva(e, usuarioDeEventos);
+     }
+     
+     public List<Evento> findAllReserva(UsuarioDeEventos usuarioDeEventos){
+         return eventoFacade.findAllReserva(usuarioDeEventos);
      }
      
      public void remove(EventoDTO e){
@@ -269,4 +307,18 @@ public class EventoService {
         eventoFacade.create(eventoEditar);
         
     }
+     
+     public void addPublico(Evento evento, Publico publico) {
+        List<Publico> listaPublico = evento.getPublicoList();
+        listaPublico.add(publico);
+        evento.setPublicoList(listaPublico);
+        eventoFacade.edit(evento);
+     }
+     
+     public void removePublico(Evento evento, Publico publico) {
+        List<Publico> listaPublico = evento.getPublicoList();
+        listaPublico.remove(publico);
+        evento.setPublicoList(listaPublico);
+        eventoFacade.edit(evento);
+     }
 }
