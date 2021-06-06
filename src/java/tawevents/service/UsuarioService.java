@@ -170,4 +170,25 @@ public class UsuarioService {
             this.usuarioFacade.edit(usuario);
         }
     }
+    
+    public void editarUsuario(String id, String nickname, String contrasena,
+            String tipoUsuario, String nombre, String apellidos, String correoElectronico, String ciudad, String sexo, Date fechaNacimiento) {
+
+        UsuarioDeEventos usuarioEventos = this.usuarioFacade.find(new Integer(id)).getUsuarioDeEventos();
+        usuarioEventos.setNombre(nombre);
+        usuarioEventos.setApellidos(apellidos);
+        usuarioEventos.setCorreo(correoElectronico);
+        usuarioEventos.setCiudad(ciudad);
+        usuarioEventos.setSexo(sexo);
+        usuarioEventos.setFechaNacimiento(fechaNacimiento);
+        usuarioDeEventosFacade.edit(usuarioEventos);
+        
+        Usuario usuario = this.usuarioFacade.find(new Integer(id));
+        
+        usuario.setNickname(nickname);
+        usuario.setContrasena(contrasena);
+        usuario.setTipoUsuario(tipoUsuario);
+        usuario.setUsuarioDeEventos(usuarioEventos);
+        this.usuarioFacade.edit(usuario);
+    }
 }

@@ -4,9 +4,11 @@
     Author     : Ivan
 --%>
 
+<%@page import="tawevents.dto.UsuarioDeEventosDTO"%>
+<%@page import="tawevents.dto.UsuarioDTO"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.util.Date"%>
-<%@page import="tawevents.entity.Usuario"%>
+
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -22,14 +24,15 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
     </head>
     <%
-        Usuario usuario = (Usuario)session.getAttribute("usuario");
+        UsuarioDTO usuario = (UsuarioDTO)session.getAttribute("usuario");
         if (usuario == null) {
     %>        
     <jsp:forward page="inicioSesion.jsp" />
         
     <%
         }
-        Usuario usuarioEditar = (Usuario)request.getAttribute("usuarioEditar");
+        UsuarioDTO usuarioEditar = (UsuarioDTO)request.getAttribute("usuarioEditar");
+        UsuarioDeEventosDTO usuarioEventoEditar = (UsuarioDeEventosDTO)request.getAttribute("usuarioEventoEditar");
         String strError = (String)request.getAttribute("errorRegistro");
             
             
@@ -37,12 +40,12 @@
             String strContrasena = usuarioEditar.getContrasena();
             String strTipoUsuario = usuarioEditar.getTipoUsuario();
             String strId = usuarioEditar.getId().toString();
-            String strCorreo = usuarioEditar.getUsuarioDeEventos().getCorreo();
-            String strNombre = usuarioEditar.getUsuarioDeEventos().getNombre();
-            String strApellidos = usuarioEditar.getUsuarioDeEventos().getApellidos();
-            String strCiudad = usuarioEditar.getUsuarioDeEventos().getCiudad();
-            String strSexo = usuarioEditar.getUsuarioDeEventos().getSexo();
-            String strFecha = new SimpleDateFormat("yyyy-MM-dd").format(usuarioEditar.getUsuarioDeEventos().getFechaNacimiento());
+            String strCorreo = usuarioEventoEditar.getCorreo();
+            String strNombre = usuarioEventoEditar.getNombre();
+            String strApellidos = usuarioEventoEditar.getApellidos();
+            String strCiudad = usuarioEventoEditar.getCiudad();
+            String strSexo = usuarioEventoEditar.getSexo();
+            String strFecha = new SimpleDateFormat("yyyy-MM-dd").format(usuarioEventoEditar.getFechaNacimiento());
         if (strError == null) strError = "";
     %>
     <%   

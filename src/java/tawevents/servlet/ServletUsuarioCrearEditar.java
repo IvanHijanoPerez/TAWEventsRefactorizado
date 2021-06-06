@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import tawevents.dto.UsuarioDTO;
+import tawevents.dto.UsuarioDeEventosDTO;
+import tawevents.service.UsuarioDeEventosService;
 import tawevents.service.UsuarioService;
 
 
@@ -26,6 +28,9 @@ import tawevents.service.UsuarioService;
  */
 @WebServlet(name = "ServletUsuarioCrearEditar", urlPatterns = {"/ServletUsuarioCrear", "/ServletUsuarioEditar"})
 public class ServletUsuarioCrearEditar extends HttpServlet {
+
+    @EJB
+    private UsuarioDeEventosService usuarioDeEventosService;
 
     @EJB
     private UsuarioService usuarioService;
@@ -55,7 +60,9 @@ public class ServletUsuarioCrearEditar extends HttpServlet {
                 if(us.getTipoUsuario().equals("usuariodeeventos")){
                     strTo = "editarUsuarioDeEventos.jsp";
                 }
-                request.setAttribute("usuarioEditar", us);            
+                UsuarioDeEventosDTO usEv = this.usuarioDeEventosService.findById(us.getUsuarioDeEventos()).getDTO();
+                request.setAttribute("usuarioEditar", us);
+                request.setAttribute("usuarioEventoEditar", usEv);  
             }        
 
         }

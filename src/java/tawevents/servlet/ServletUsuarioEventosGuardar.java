@@ -22,10 +22,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import tawevents.dao.UsuarioDeEventosFacade;
-import tawevents.dao.UsuarioFacade;
-import tawevents.entity.Usuario;
-import tawevents.entity.UsuarioDeEventos;
+import tawevents.dto.UsuarioDTO;
+import tawevents.dto.UsuarioDeEventosDTO;
+import tawevents.service.UsuarioDeEventosService;
+import tawevents.service.UsuarioService;
 
 /**
  *
@@ -33,11 +33,13 @@ import tawevents.entity.UsuarioDeEventos;
  */
 @WebServlet(name = "ServletUsuarioEventosGuardar", urlPatterns = {"/ServletUsuarioEventosGuardar"})
 public class ServletUsuarioEventosGuardar extends HttpServlet {
+
     @EJB
-    private UsuarioFacade UsuarioFacade;
+    private UsuarioService usuarioService;
+
+    @EJB
+    private UsuarioDeEventosService usuarioDeEventosService;
     
-    @EJB
-    private UsuarioDeEventosFacade UsuarioDeEventosFacade;
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -50,7 +52,7 @@ public class ServletUsuarioEventosGuardar extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Usuario usuario = (Usuario)session.getAttribute("usuario");
+        UsuarioDTO usuario = (UsuarioDTO)session.getAttribute("usuario");
         if (usuario == null) {
             request.setAttribute("errorRegistro", "Usuario no autenticado");
             RequestDispatcher rd = request.getRequestDispatcher("inicioSesion.jsp");
@@ -59,8 +61,8 @@ public class ServletUsuarioEventosGuardar extends HttpServlet {
             String id = "",strErrorNick = "", strErrorCorreo = "", strErrorFormato = "", strErrorConfirmar = "", strTo = "";
             String nick, correoElectronico, contrasena, confirmarContrasena, nombre, apellidos, ciudad, sexo;
             Date fechaNacimiento = null;
-            UsuarioDeEventos usuarioEventos;
-            Usuario usuarioBase;
+            
+            
 
             // ----------------------
 
@@ -98,24 +100,26 @@ public class ServletUsuarioEventosGuardar extends HttpServlet {
 
             Pattern regexPattern = Pattern.compile("^(.+)@(.+)$");
             Matcher regMatcher   = regexPattern.matcher(correoElectronico);
-
-            Boolean nickUnico = UsuarioFacade.esNickUnico(nick);
-            Boolean correoUnico = UsuarioDeEventosFacade.esCorreoUnico(correoElectronico);
+            
+            UsuarioDTO usuarioBase = this.usuarioService.buscarUsuario(new Integer(id));
+            UsuarioDeEventosDTO usuarioEventos = this.usuarioDeEventosService.findById(usuarioBase.getUsuarioDeEventos()).getDTO();
+            
+            Boolean nickUnico = usuarioService.esNickUnico(nick);
+            Boolean correoUnico = usuarioDeEventosService.esCorreoUnico(correoElectronico);
             Boolean formatoCorreoValido = regMatcher.matches();
             Boolean coincidenContrasenas = contrasena.equals(confirmarContrasena);
-            usuarioBase = this.UsuarioFacade.find(new Integer(id));
             if(fechaNacimiento.after(new Date())){
                 request.setAttribute("errorFecha", "Error de edición: fecha no válida");
                 RequestDispatcher rd = request.getRequestDispatcher("ServletUsuarioEditar?id=" + usuarioBase.getId());
                  rd.forward(request, response);
             }else{
-                if ((!nickUnico && !nick.equals(usuarioBase.getNickname())) || (!correoUnico && !correoElectronico.equals(usuarioBase.getUsuarioDeEventos().getCorreo()))  || !formatoCorreoValido || !coincidenContrasenas) { // Si hay algun error en el formulario
+                if ((!nickUnico && !nick.equals(usuarioBase.getNickname())) || (!correoUnico && !correoElectronico.equals(usuarioEventos.getCorreo()))  || !formatoCorreoValido || !coincidenContrasenas) { // Si hay algun error en el formulario
                 strTo = "ServletUsuarioEditar?id=" + usuarioBase.getId();
                 if (!nickUnico && !nick.equals(usuarioBase.getNickname())) { // Si ya hay un usuario con ese nick
                     strErrorNick = "Error de edición: el nick introducido ya está en uso";
                     request.setAttribute("errorNick", strErrorNick);
                 }
-                if (!correoUnico && !correoElectronico.equals(usuarioBase.getUsuarioDeEventos().getCorreo())) { // Si ya hay un usuario con ese correo
+                if (!correoUnico && !correoElectronico.equals(usuarioEventos.getCorreo())) { // Si ya hay un usuario con ese correo
                     strErrorCorreo = "Error de edición: el correo electrónico elegido ya está en uso";
                     request.setAttribute("errorCorreo", strErrorCorreo);
                 }
@@ -131,16 +135,7 @@ public class ServletUsuarioEventosGuardar extends HttpServlet {
                 rd.forward(request, response);
                 
                 } else { // Si no hay errores
-                    usuarioEventos = usuarioBase.getUsuarioDeEventos();
-                    usuarioEventos.setNombre(nombre);
-                    usuarioEventos.setApellidos(apellidos);
-                    usuarioEventos.setCorreo(correoElectronico);
-                    usuarioEventos.setCiudad(ciudad);
-                    usuarioEventos.setSexo(sexo);
-                    usuarioEventos.setFechaNacimiento(fechaNacimiento);
-                    usuarioBase.setNickname(nick);
-                    usuarioBase.setContrasena(contrasena);
-                    this.UsuarioFacade.edit(usuarioBase);
+                    this.usuarioService.editarUsuario(usuarioBase.getId().toString(),nick,contrasena,usuarioBase.getTipoUsuario(), nombre, apellidos, correoElectronico, ciudad, sexo, fechaNacimiento);
                     response.sendRedirect("ServletUsuarioListar");
                 }
             }
