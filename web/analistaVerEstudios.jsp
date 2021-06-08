@@ -6,10 +6,8 @@
 
 <%@page import="tawevents.dto.UsuarioDTO"%>
 <%@page import="tawevents.dto.EstudioDTO"%>
-<%@page import="tawevents.entity.Usuario"%>
 <%@page import="java.util.Date"%>
 <%@page import="java.text.SimpleDateFormat"%>
-<%@page import="tawevents.entity.Estudio"%>
 <%@page import="java.util.List"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>

@@ -21,6 +21,7 @@ import tawevents.dao.EstudioFacade;
 import tawevents.dao.UsuarioFacade;
 import tawevents.dto.EstudioDTO;
 import tawevents.dto.UsuarioDTO;
+import tawevents.dto.UsuarioDeEventosDTO;
 import tawevents.entity.Estudio;
 import tawevents.entity.Evento;
 import tawevents.entity.Publico;
@@ -133,22 +134,27 @@ public class EstudioService {
         return datos;
     }
 
-    public List<Usuario> analizarBaseDeDatos(List<String> datos) {
-        List<Usuario> resultados = new ArrayList<>();
-
-        //for (UsuarioDeEventos ude : this.usuarioDeEventosFacade.findAll()) {
+    public Object[] analizarBaseDeDatos(List<String> datos) {
+        List<UsuarioDTO> listaUsuarios = new ArrayList<>();
+        List<UsuarioDeEventosDTO> listaUdE = new ArrayList<>();
         for (Usuario u : filtrarUsuarios(datos)) {
             UsuarioDeEventos ude = u.getUsuarioDeEventos();
             if (ude != null && (datos.get(14).equals("usuariodeeventos") || datos.get(14).isEmpty())) {
                 if (edadEnRango(ude.getFechaNacimiento(), datos.get(10), datos.get(11))) {
                     if (filtrosDeEvento(ude, datos)) {
-                        resultados.add(u);
+                        listaUsuarios.add(u.getDTO());
+                        listaUdE.add(ude.getDTO());
                     }
                 }
             } else if (noSeUsanFiltrosDeEvento(datos) && !u.getTipoUsuario().equals("usuariodeeventos")) {
-                resultados.add(u);
+                listaUsuarios.add(u.getDTO());
+                listaUdE.add(null);
             }
         }
+        
+        Object[] resultados = new Object[2];
+        resultados[0] = listaUsuarios;
+        resultados[1] = listaUdE;
         return resultados;
     }
 

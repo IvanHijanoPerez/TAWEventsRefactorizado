@@ -4,14 +4,12 @@
     Author     : daniel
 --%>
 
+<%@page import="tawevents.dto.UsuarioDeEventosDTO"%>
 <%@page import="tawevents.dto.EstudioDTO"%>
 <%@page import="tawevents.dto.UsuarioDTO"%>
 <%@page import="java.util.Set"%>
-<%@page import="tawevents.entity.UsuarioDeEventos"%>
 <%@page import="java.util.List"%>
-<%@page import="tawevents.entity.Etiqueta"%>
 <%@page import="java.text.SimpleDateFormat"%>
-<%@page import="tawevents.entity.Usuario"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -38,7 +36,15 @@
         String modo = (String) request.getAttribute("modo");
         EstudioDTO estudio = (EstudioDTO) request.getAttribute("estudio");
         List<String> datos = (List<String>) request.getAttribute("datos");
-        List<Usuario> resultados = (List<Usuario>) request.getAttribute("resultados");
+
+        // Recoger resultados
+        Object[] resultados = (Object[])request.getAttribute("resultados");
+        List<UsuarioDTO> listaUsuarios = null;
+        List<UsuarioDeEventosDTO> listaUdE = null;
+        if (resultados != null) {
+            listaUsuarios = (List<UsuarioDTO>) resultados[0];
+            listaUdE = (List<UsuarioDeEventosDTO>) resultados[1];
+        }   
         Set<String> ciudades = (Set<String>) request.getAttribute("ciudades");
 
         if (modo.equals("crear")) {
@@ -68,14 +74,14 @@
                 <li>
                     <a href="ServletAnalistaVerEstudio?modo=crear&id=<%=estudio.getId()%>"> Crear desde </a>
                 </li>
-                <% }
+                <% 
+                    }
                 %>
                 <li style="float:right">
                     <a href="ServletCerrarSesion"> Cerrar sesión </a>
                 </li>
             </ul>
         </div>
-
         <div class="container">
             <br/>
             <%
@@ -94,7 +100,7 @@
             <div class="container-fluid"> 
                 <form name="nuevoEstudio" methor="post" action="ServletAnalistaCrearEstudio">
                     Descripción: <br/>
-                    <div class="form-group"> 
+                    <div id="descripcion-estudio" class="form-group"> 
                         <input type="text" name="descripcion" title="Describa el análisis" maxlength="100" value="<%=(estudio == null) ? "" : estudio.getDescripcion()%>" 
                                class="form-control" size="30" <%=disabled%>  required="true"/>
                     </div>
@@ -158,6 +164,7 @@
                                         %>                                        
                                     </select> <br/> <br/>
                                 </div>
+                                <div class="col"> </div>
                             </div>
                             Edad entre &nbsp
                             <input type="number" name="edad_min" value="<%=datos.get(10)%>" size="5" <%=disabled%> 
@@ -219,22 +226,24 @@
                     </thead>
                     <tbody>
                         <%
-                            if (resultados != null) {
+                            if (listaUsuarios != null) {
                                 SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
-                                for (Usuario u : resultados) {
+                                int i = 0;
+                                for (UsuarioDTO u : listaUsuarios) {
                         %>
                         <tr>
                             <td> <%= u.getId()%> </td>
                             <td> <%= u.getNickname()%> </td>
                             <td> <%= u.getTipoUsuario()%> </td>
                             <%
-                                if (u.getUsuarioDeEventos() != null) {
+                                UsuarioDeEventosDTO ude = listaUdE.get(i);
+                                if (ude != null) {
                             %>
-                            <td> <%= u.getUsuarioDeEventos().getNombre()%> </td>
-                            <td> <%= u.getUsuarioDeEventos().getApellidos()%> </td>
-                            <td> <%= u.getUsuarioDeEventos().getCorreo()%> </td>
-                            <td> <%= u.getUsuarioDeEventos().getCiudad()%> </td>
-                            <td> <%= formatoFecha.format(u.getUsuarioDeEventos().getFechaNacimiento())%> </td>
+                            <td> <%= ude.getNombre()%> </td>
+                            <td> <%= ude.getApellidos()%> </td>
+                            <td> <%= ude.getCorreo()%> </td>
+                            <td> <%= ude.getCiudad()%> </td>
+                            <td> <%= formatoFecha.format(ude.getFechaNacimiento())%> </td>
                             <%
                             } else {
                             %>
@@ -248,6 +257,7 @@
                             %>
                         </tr>
                         <%
+                            i++;
                                 }
                             }
                         %>

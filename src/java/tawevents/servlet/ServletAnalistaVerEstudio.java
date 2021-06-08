@@ -11,11 +11,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import tawevents.dao.EventoFacade;
-import tawevents.dao.UsuarioDeEventosFacade;
 import tawevents.dto.EstudioDTO;
 import tawevents.dto.UsuarioDTO;
-import tawevents.entity.Usuario;
 import tawevents.service.EstudioService;
 
 /**
@@ -24,12 +21,6 @@ import tawevents.service.EstudioService;
  */
 @WebServlet(name = "ServletAnalistaVerEstudio", urlPatterns = {"/ServletAnalistaVerEstudio"})
 public class ServletAnalistaVerEstudio extends HttpServlet {
-
-    @EJB
-    private EventoFacade eventoFacade;
-
-    @EJB
-    private UsuarioDeEventosFacade usuarioDeEventosFacade;
 
     @EJB
     private EstudioService estudioService;
@@ -74,7 +65,8 @@ public class ServletAnalistaVerEstudio extends HttpServlet {
             ciudades = this.estudioService.encontrarCiudadesParaCrearEstudio();
             request.setAttribute("ciudades", ciudades);
         } else if (modo.equals("ver")) {
-            List<Usuario> resultados = this.estudioService.analizarBaseDeDatos(datos); // USUARIO DTO
+            // Object[0] = List<UsuarioDTO> // Object[1] = List<UsuarioDeEventosDTO>
+            Object[] resultados = this.estudioService.analizarBaseDeDatos(datos);
             request.setAttribute("resultados", resultados);
         }
         request.setAttribute("estudio", estudio);

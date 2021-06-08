@@ -6,13 +6,8 @@
 package tawevents.servlet;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -21,11 +16,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import tawevents.dao.EstudioFacade;
-import tawevents.dto.EstudioDTO;
 import tawevents.dto.UsuarioDTO;
-import tawevents.entity.Estudio;
-import tawevents.entity.Usuario;
 import tawevents.service.EstudioService;
 
 /**
