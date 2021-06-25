@@ -57,9 +57,9 @@ public class ServletCreadorDeEventosBorrar extends HttpServlet {
        HttpSession session = request.getSession();
        UsuarioDTO usuario = (UsuarioDTO)session.getAttribute("usuario");
 
-            EventoDTO eventoABorrar = eventoService.find(Integer.parseInt(request.getParameter("idE")));
+            EventoDTO eventoABorrar = eventoService.buscarEvento(Integer.parseInt(request.getParameter("idE")));
             
-            for(EtiquetaDTO e : etiquetaService.convertirAListaDTOdirectamente(eventoABorrar.getEtiquetaList())){
+       /*     for(EtiquetaDTO e : etiquetaService.convertirAListaDTOdirectamente(eventoABorrar.getEtiquetaList())){
                 List<EventoDTO> eventoList = eventoService.convertirAListaDTOdirectamente(e.getEventoList());
                 eventoList.remove(eventoABorrar);
                 if(eventoList.isEmpty()){
@@ -68,11 +68,29 @@ public class ServletCreadorDeEventosBorrar extends HttpServlet {
                     e.setEventoList(eventoService.convertirALaInversa(eventoList));
                     etiquetaService.edit(e);
                 }
+            } */
+       
+            for(int idEtiqueta : eventoABorrar.getEtiquetaList()){
+                EtiquetaDTO etiqueta = etiquetaService.find(idEtiqueta);
+                List<Integer> eventosDeLaEtiqueta = etiqueta.getEventoList();
+                
+                for(int ev : eventosDeLaEtiqueta){
+                    System.out.println("LA ETIQUETA TIENEEEE EL EVENTO: " + ev);
+                }
+                
+                eventosDeLaEtiqueta.remove(eventoABorrar.getId());
+                if(eventosDeLaEtiqueta.isEmpty()){
+                    etiquetaService.remove(etiqueta);
+                }else{
+                    etiqueta.setEventoList(eventosDeLaEtiqueta);
+                    etiquetaService.edit(etiqueta);
+                }              
             }
-            eventoService.remove(eventoABorrar);
+            eventoService.borrarEvento(eventoABorrar);
             
-            List eventosList = usuario.getEventoList();
+            List<Integer> eventosList = usuario.getEventoList();
             eventosList.remove(eventoABorrar.getId());
+            usuario.setEventoList(eventosList);
             usuarioService.edit(usuario);
             
             response.sendRedirect("ServletCreadorDeEventosListar"); 

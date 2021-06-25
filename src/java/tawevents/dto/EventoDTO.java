@@ -5,9 +5,12 @@
  */
 package tawevents.dto;
  
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.ejb.EJB;
 import tawevents.entity.Etiqueta;
+import tawevents.service.EtiquetaService;
 
 /**
  *
@@ -30,6 +33,9 @@ public class EventoDTO {
     private List<Integer> publicoList;
     private Integer usuario;
 
+    @EJB
+    private EtiquetaService etiquetaService;
+    
     public Integer getId() {
         return id;
     }

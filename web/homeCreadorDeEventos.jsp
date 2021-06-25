@@ -4,6 +4,7 @@
     Author     : rafar
 --%>
 
+<%@page import="java.util.ArrayList"%>
 <%@page import="tawevents.service.EtiquetaService"%>
 <%@page import="javax.ejb.EJB"%>
 <%@page import="tawevents.dto.EtiquetaDTO"%>
@@ -23,6 +24,7 @@
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
         UsuarioDTO usuario = (UsuarioDTO) request.getAttribute("usuario");
         String filtro = request.getParameter("filtro");
+        List<EtiquetaDTO> todasLasEtiquetas = (List) request.getAttribute("todasLasEtiquetas");
         if (filtro == null) {
             filtro = "";
         }
@@ -115,12 +117,20 @@
                 <td><%= format.format(evento.getFechaLimEntradas())%></td> 
                 <td><%= evento.getMaxEntradasPorUsuario()%></td> 
                 <td>
-                  <%
+                <%
+                    List<EtiquetaDTO> etiquetasDelEvento = new ArrayList();
+                    for(int id : evento.getEtiquetaList()){
+                        for(EtiquetaDTO etiqueta : todasLasEtiquetas){
+                            if(id == etiqueta.getId()){
+                                etiquetasDelEvento.add(etiqueta);
+                            }
+                        }
+                    }
                     
-                    for(Integer e : evento.getEtiquetaList()){         // for(EtiquetaDTO e : evento.getEtiquetaList()){     
+                    for(EtiquetaDTO e : etiquetasDelEvento){
                 %>
-                    <%=e%>
-                    <%
+                <%=e.getNombre() %>
+                <%
                     }
                 %>
                 </td>

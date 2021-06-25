@@ -219,6 +219,10 @@ public class EventoService {
         return convertirAListaDTO(eventoFacade.findByDisponiblesMasCercanos());
     }
     
+     public int findIdMasAlta() {
+        return eventoFacade.findIdMasAlta();
+    }
+    
     public Map<EventoDTO, List<PublicoDTO>> construirMap(List<EventoDTO> lista) {
         Map<EventoDTO, List<PublicoDTO>> map = new HashMap<>();
         List<Evento> eventos = convertirAListaEvento(convertirALaInversa(lista));
@@ -290,6 +294,29 @@ public class EventoService {
         eventoFacade.edit(eventoEditar);
      }
      
+     public void editarEvento2 (Integer eventoId, Integer idUsuario, String titulo, String descripcion, Integer precio, String imagen, Date fecha, Date fecha_limite_entradas, Integer aforo_maximo, Integer maximo_entradas_usuario, String asientos_asignados, String numero_filas, String asientos_por_fila) {
+        Evento eventoEditar = eventoFacade.find(eventoId);
+        eventoEditar.setTitulo(titulo);
+        eventoEditar.setDescripcion(descripcion);
+        eventoEditar.setPrecioEntrada(precio); 
+        eventoEditar.setImagen(imagen);
+        eventoEditar.setFecha(fecha);
+        eventoEditar.setFechaLimEntradas(fecha_limite_entradas);
+        eventoEditar.setAforoMax(aforo_maximo);
+        eventoEditar.setMaxEntradasPorUsuario(maximo_entradas_usuario);   
+        if("Si".equals(asientos_asignados)){
+            eventoEditar.setAsientosAsignados(true);
+            eventoEditar.setNumFilas(Integer.parseInt(numero_filas));
+            eventoEditar.setAsientosPorFila(Integer.parseInt(asientos_por_fila)); 
+        }else{
+            eventoEditar.setAsientosAsignados(false);
+            eventoEditar.setNumFilas(null);
+            eventoEditar.setAsientosPorFila(null); 
+         }
+        
+        eventoFacade.edit(eventoEditar);
+     }
+     
      public void crearEvento (Integer idUsuario, String titulo, String descripcion, String etiquetas, Integer precio, String imagen, Date fecha, Date fecha_limite_entradas, Integer aforo_maximo, Integer maximo_entradas_usuario, String asientos_asignados, String numero_filas, String asientos_por_fila) {
         Evento eventoEditar = new Evento();
         eventoEditar.setUsuario(usuarioFacade.find(idUsuario));
@@ -324,7 +351,8 @@ public class EventoService {
             }
         }
         eventoEditar.setEtiquetaList(etiquetaList);
-
+        eventoEditar.setUsuario(usuarioFacade.find(idUsuario));
+        
         eventoFacade.create(eventoEditar);
         
     }

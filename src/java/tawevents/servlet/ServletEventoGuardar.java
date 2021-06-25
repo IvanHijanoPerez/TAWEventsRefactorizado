@@ -6,7 +6,6 @@
 package tawevents.servlet;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,12 +21,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import tawevents.dao.EtiquetaFacade;
-import tawevents.dao.EventoFacade;
-import tawevents.dao.UsuarioFacade;
-import tawevents.entity.Etiqueta;
-import tawevents.entity.Evento;
-import tawevents.entity.Usuario;
+import tawevents.dto.EtiquetaDTO;
+import tawevents.dto.EventoDTO;
+import tawevents.dto.UsuarioDTO;
+import tawevents.service.EtiquetaService;
+import tawevents.service.EventoService;
+import tawevents.service.UsuarioService;
 
 /**
  *
@@ -37,13 +36,13 @@ import tawevents.entity.Usuario;
 public class ServletEventoGuardar extends HttpServlet {
 
     @EJB
-    private EventoFacade eventoFacade;
+    private EventoService eventoService;
     
     @EJB
-    private UsuarioFacade usuarioFacade;
+    private EtiquetaService etiquetaService;
     
     @EJB
-    private EtiquetaFacade etiquetaFacade;
+    private UsuarioService usuarioService;
     
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -57,14 +56,14 @@ public class ServletEventoGuardar extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Usuario u = (Usuario) session.getAttribute("usuario");    
+        UsuarioDTO u = (UsuarioDTO) session.getAttribute("usuario");
         
-        String titulo, descripcion, imagen, aforo_maximo, maximo_entradas_usuario, asientos_asignados, numero_filas, asientos_por_fila, precio, etiquetas;
+        String titulo, descripcion, imagen, aforo_maximo, maximo_entradas_usuario, asientos_asignados, numero_filas, asientos_por_fila, precio, etiquetas; 
         
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         Date fecha = null;
         Date fecha_limite_entradas = null;
-        Evento evento = new Evento();
+        EventoDTO evento = new EventoDTO();
         
         titulo = request.getParameter("titulo");
         descripcion = request.getParameter("descripcion");
@@ -113,19 +112,22 @@ public class ServletEventoGuardar extends HttpServlet {
         }else{
             evento.setAsientosAsignados(false);
         } 
-        evento.setUsuario(u);  
+        evento.setUsuario(u.getId());  
         
-        List<Etiqueta> etiquetaList = new ArrayList(); 
+        List<Integer> etiquetaList = new ArrayList();
         String[] arrayEtiquetas = etiquetas.split(" ");
         for(String item : arrayEtiquetas){
-            Etiqueta buscada = etiquetaFacade.findBySimilarNombre(item);
+            EtiquetaDTO buscada = etiquetaService.findBySimilarNombre(item);
             if(buscada==null){
-                   Etiqueta e = new Etiqueta();
+                /*   EtiquetaDTO e = new EtiquetaDTO();
                   e.setNombre(item);
                  etiquetaList.add(e);
-                etiquetaFacade.create(e);  
+                 etiquetaService.create(e);  */
+                
+                int id = etiquetaService.crearEtiqueta(item);
+                etiquetaList.add(id);
             }else{
-                etiquetaList.add(buscada);
+                etiquetaList.add(buscada.getId());
             }
         }
         evento.setEtiquetaList(etiquetaList);
@@ -142,7 +144,7 @@ public class ServletEventoGuardar extends HttpServlet {
             
             }else{ //estamos en editar
                 int idEventoEditar = Integer.parseInt(request.getParameter("idEventoEditar"));
-                Evento eventoEditar = eventoFacade.find(idEventoEditar);
+               EventoDTO eventoEditar = eventoService.find(idEventoEditar);
                request.setAttribute("evento", eventoEditar);
                request.setAttribute("mensajeError", mensajeError);
                RequestDispatcher rd = request.getRequestDispatcher("editarEventoCreadorDeEventos.jsp");
@@ -151,28 +153,30 @@ public class ServletEventoGuardar extends HttpServlet {
         }
 
         if(request.getParameter("idEventoEditar") == null){ //estamos en guardar
-            eventoFacade.create(evento);
+            eventoService.crearEvento(u.getId(), titulo, descripcion, etiquetas, Integer.parseInt(precio), imagen, fecha, fecha_limite_entradas, Integer.parseInt(aforo_maximo), Integer.parseInt(maximo_entradas_usuario), asientos_asignados, numero_filas, asientos_por_fila);
             
-            int idMasAlta = eventoFacade.findIdMasAlta();
-            Evento ev = eventoFacade.find(idMasAlta);
+            int idMasAlta = eventoService.findIdMasAlta();
+            EventoDTO ev = eventoService.find(idMasAlta);
             
-            for(Etiqueta e : ev.getEtiquetaList()){
-            List<Evento> eventoList = e.getEventoList(); 
-            eventoList.add(ev);
+            for(EtiquetaDTO e : etiquetaService.convertirAListaDTOdirectamente(ev.getEtiquetaList())){
+            List<Integer> eventoList = e.getEventoList();
+            eventoList.add(ev.getId());
             e.setEventoList(eventoList);
-            // aqui se haria el edit?
-            etiquetaFacade.edit(e);
+            etiquetaService.edit(e);
         }
-            
-            List <Evento> listaEventos = u.getEventoList();
-            listaEventos.add(evento);
-            u.setEventoList(listaEventos);
-            usuarioFacade.edit(u);
+            List <EventoDTO> listaEventos = eventoService.convertirAListaDTOdirectamente(u.getEventoList());
+            listaEventos.add(ev);
+            u.setEventoList(eventoService.convertirALaInversa(listaEventos));
+            usuarioService.edit(u);
         }else{ // estamos en editar
+            
         int idEventoEditar = Integer.parseInt(request.getParameter("idEventoEditar"));
-        Evento eventoEditar = eventoFacade.find(idEventoEditar);
+        eventoService.editarEvento2(idEventoEditar, u.getId(), titulo, descripcion, Integer.parseInt(precio), imagen, fecha, fecha_limite_entradas, Integer.parseInt(aforo_maximo), Integer.parseInt(maximo_entradas_usuario), asientos_asignados, numero_filas, asientos_por_fila);
         
-        List <Evento> listaEventos = u.getEventoList();
+        /*
+        EventoDTO eventoEditar = eventoService.find(idEventoEditar);
+        
+        List <EventoDTO> listaEventos = eventoService.convertirAListaDTOdirectamente(u.getEventoList());
         listaEventos.remove(eventoEditar);
         
         eventoEditar.setTitulo(titulo);
@@ -194,10 +198,11 @@ public class ServletEventoGuardar extends HttpServlet {
             eventoEditar.setAsientosAsignados(false);
          }
         
-        eventoFacade.edit(eventoEditar);
+        eventoService.editarEvento(eventoEditar);
         listaEventos.add(eventoEditar);
-        u.setEventoList(listaEventos);
-        usuarioFacade.edit(u);
+        u.setEventoList(eventoService.convertirALaInversa(listaEventos));
+        usuarioService.edit(u); */
+        
         }
      
         response.sendRedirect("ServletCreadorDeEventosListar");

@@ -10,6 +10,7 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import tawevents.dao.EtiquetaFacade;
+import tawevents.dao.EventoFacade;
 import tawevents.dto.EtiquetaDTO;
 import tawevents.entity.Etiqueta;
 
@@ -21,6 +22,9 @@ import tawevents.entity.Etiqueta;
 public class EtiquetaService {
      @EJB
      private EtiquetaFacade etiquetaFacade;
+     
+     @EJB
+     private EventoFacade eventoFacade;
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
      
@@ -63,12 +67,25 @@ public class EtiquetaService {
          return (et == null) ? null : et.getDTO();
      }
      
+     public List<EtiquetaDTO> findBySimilarNombreMuchas(String nombre){
+         List<Etiqueta> et = etiquetaFacade.findBySimilarNombreMuchas(nombre);
+         return this.convertirAListaDTO(et);
+     }
+     
      public void remove(EtiquetaDTO e){
          etiquetaFacade.remove(etiquetaFacade.find(e.getId()));
      }
      
+      public List<EtiquetaDTO> findAll(){
+         return this.convertirAListaDTO(etiquetaFacade.findAll());
+     }
+     
      public void edit(EtiquetaDTO e){
          etiquetaFacade.edit(etiquetaFacade.find(e.getId()));
+     }
+     
+     public EtiquetaDTO find(int id){
+        return etiquetaFacade.find(id).getDTO();
      }
      
      public EtiquetaDTO filtroNombre(String nombre){
@@ -89,6 +106,6 @@ public class EtiquetaService {
         Etiqueta etiqueta = new Etiqueta();            
         etiqueta.setNombre(nombre);      
         this.etiquetaFacade.create(etiqueta);   
-        return etiqueta.getId();
+        return etiquetaFacade.findByNombreExacto(nombre).getId();
     }
 }

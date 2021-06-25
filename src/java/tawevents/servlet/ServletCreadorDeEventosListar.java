@@ -7,6 +7,7 @@ package tawevents.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
@@ -56,24 +57,32 @@ public class ServletCreadorDeEventosListar extends HttpServlet {
         
         String filtro = request.getParameter("filtro");
         if(filtro != null && filtro.length() > 0){
-            List <EventoDTO> lista = eventoService.findByTitulo(filtro);
-            lista.retainAll(eventoService.convertirAListaDTO(eventoService.convertirAListaEvento(usuario.getEventoList())));
             
-            EtiquetaDTO e = etiquetaService.findBySimilarNombre(filtro);
-            if(e != null){
-                for(EventoDTO even : eventoService.convertirAListaDTO(eventoService.convertirAListaEvento(e.getEventoList()))){
-                    if(!lista.contains(even) && eventoService.convertirAListaDTO(eventoService.convertirAListaEvento(usuario.getEventoList())).contains(even)){
+           List <Integer> lista = eventoService.convertirALaInversa(eventoService.findByTitulo(filtro));
+           lista.retainAll(usuario.getEventoList());
+            // falta filtrar por etiquetas:  (+ el borrado bien hecho)
+            List<EtiquetaDTO> etList = etiquetaService.findBySimilarNombreMuchas(filtro);
+            if(!etList.isEmpty()){
+            for(EtiquetaDTO e : etList){
+            
+                System.out.println("Etiquetaaaa: " + e.getNombre());
+                for(int even : e.getEventoList()){
+                    if(!lista.contains(even) && usuario.getEventoList().contains(even)){
                         lista.add(even);
-                    }
+                    } 
                 }
             }
+            }
                 
-            request.setAttribute("listaEventos", lista);
+            request.setAttribute("listaEventos", eventoService.convertirAListaDTOdirectamente(lista));
+            
         }else{ 
-            request.setAttribute("listaEventos", eventoService.convertirAListaDTO(eventoService.convertirAListaEvento(usuario.getEventoList())));
+            List <EventoDTO> lEventos = eventoService.convertirAListaDTOdirectamente(usuario.getEventoList());
+            request.setAttribute("listaEventos", lEventos);
         }
         request.setAttribute("usuario", usuario);
-        
+        List<EtiquetaDTO> todasLasEtiquetas = etiquetaService.findAll();
+        request.setAttribute("todasLasEtiquetas", todasLasEtiquetas);
         request.setAttribute("filtro", filtro);
                 
         RequestDispatcher rd = request.getRequestDispatcher("homeCreadorDeEventos.jsp");

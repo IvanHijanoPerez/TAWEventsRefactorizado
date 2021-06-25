@@ -56,6 +56,14 @@ public class EtiquetaFacade extends AbstractFacade<Etiqueta> {
         return (q.getResultList().isEmpty()) ? null : (Etiqueta)q.getResultList().get(0);        
     }
     
+    public List<Etiqueta> findBySimilarNombreMuchas (String filtro) {
+        Query q;  
+        q = em.createQuery("SELECT e FROM Etiqueta e WHERE UPPER(e.nombre) LIKE UPPER(:tit)");
+        q.setParameter("tit", "%" + filtro + "%");
+    
+        return (List)q.getResultList();        
+    }
+    
     public Etiqueta findBySimilarNombreI (String filtro) {
         Query q;  
         q = em.createQuery("SELECT e FROM Etiqueta e WHERE UPPER(e.nombre) = UPPER(:tit)");
